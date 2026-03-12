@@ -519,6 +519,167 @@ def api_session_queue(pack_id):
     return jsonify(tier1 + tier2)
 
 
+# ── Browse Mode ──────────────────────────────────────────────────────────────
+
+@app.route('/superuser/browse')
+def su_browse():
+    db = get_db()
+    packs = db.execute('SELECT * FROM pack ORDER BY name').fetchall()
+    speaker_labels = [r['speaker_label'] for r in db.execute(
+        'SELECT DISTINCT speaker_label FROM recording WHERE speaker_label IS NOT NULL ORDER BY speaker_label'
+    ).fetchall()]
+    db.close()
+    return render_template('superuser/browse.html', packs=packs, speaker_labels=speaker_labels)
+
+
+@app.route('/api/browse/data')
+def api_browse_data():
+    pack_id_filter = request.args.get('pack_id', type=int)
+    db = get_db()
+    if pack_id_filter:
+        items = db.execute('''
+            SELECT i.*, p.name as pack_name, p.published as pack_published
+            FROM item i JOIN pack p ON p.id = i.pack_id
+            WHERE i.pack_id = ? ORDER BY i.id
+        ''', (pack_id_filter,)).fetchall()
+    else:
+        items = db.execute('''
+            SELECT i.*, p.name as pack_name, p.published as pack_published
+            FROM item i JOIN pack p ON p.id = i.pack_id
+            ORDER BY p.name, i.id
+        ''').fetchall()
+
+    result = []
+    for item in items:
+        words = db.execute(
+            'SELECT * FROM word WHERE item_id = ? ORDER BY id', (item['id'],)
+        ).fetchall()
+        words_data = []
+        for w in words:
+            recs = db.execute(
+                'SELECT * FROM recording WHERE word_id = ? ORDER BY created_at', (w['id'],)
+            ).fetchall()
+            speakers = sorted({r['speaker_label'] for r in recs if r['speaker_label']})
+            words_data.append({
+                'id': w['id'],
+                'label': w['label'],
+                'rec_count': len(recs),
+                'speakers': speakers,
+                'recordings': [{
+                    'id': r['id'],
+                    'speaker_label': r['speaker_label'],
+                    'created_at': (r['created_at'] or '')[:10],
+                    'url': url_for('static', filename=f'audio/{os.path.basename(r["file_path"])}')
+                } for r in recs]
+            })
+        result.append({
+            'id': item['id'],
+            'pack_id': item['pack_id'],
+            'pack_name': item['pack_name'],
+            'pack_published': bool(item['pack_published']),
+            'words': words_data
+        })
+    db.close()
+    return jsonify(result)
+
+
+@app.route('/api/word/<int:word_id>/rename', methods=['POST'])
+def api_rename_word(word_id):
+    data = request.get_json(force=True)
+    new_label = (data.get('label') or '').strip()
+    if not new_label:
+        return jsonify({'error': 'Label cannot be empty'}), 400
+    db = get_db()
+    word = db.execute('''
+        SELECT w.*, i.pack_id, i.id as item_id FROM word w
+        JOIN item i ON i.id = w.item_id WHERE w.id = ?
+    ''', (word_id,)).fetchone()
+    if not word:
+        db.close()
+        return jsonify({'error': 'Not found'}), 404
+    dup = db.execute(
+        'SELECT id FROM word WHERE item_id = ? AND label = ? AND id != ?',
+        (word['item_id'], new_label, word_id)
+    ).fetchone()
+    if dup:
+        db.close()
+        return jsonify({'error': 'A word with that label already exists in this item'}), 409
+    db.execute('UPDATE word SET label = ? WHERE id = ?', (new_label, word_id))
+    db.commit()
+    db.close()
+    return jsonify({'ok': True, 'label': new_label})
+
+
+@app.route('/api/word/<int:word_id>/delete', methods=['POST'])
+def api_delete_word(word_id):
+    db = get_db()
+    word = db.execute('''
+        SELECT w.*, i.pack_id, i.id as item_id FROM word w
+        JOIN item i ON i.id = w.item_id WHERE w.id = ?
+    ''', (word_id,)).fetchone()
+    if not word:
+        db.close()
+        return jsonify({'error': 'Not found'}), 404
+
+    item_id = word['item_id']
+    pack_id = word['pack_id']
+
+    # Delete this word's audio files from disk
+    for rec in db.execute('SELECT file_path FROM recording WHERE word_id = ?', (word_id,)).fetchall():
+        try: os.remove(rec['file_path'])
+        except OSError: pass
+
+    db.execute('DELETE FROM word WHERE id = ?', (word_id,))
+    db.commit()
+
+    # If fewer than 2 words remain the item is no longer a valid minimal pair — delete it
+    remaining = db.execute('SELECT id FROM word WHERE item_id = ?', (item_id,)).fetchall()
+    item_deleted = False
+    if len(remaining) < 2:
+        for lone in remaining:
+            for rec in db.execute('SELECT file_path FROM recording WHERE word_id = ?', (lone['id'],)).fetchall():
+                try: os.remove(rec['file_path'])
+                except OSError: pass
+        db.execute('DELETE FROM item WHERE id = ?', (item_id,))
+        db.commit()
+        item_deleted = True
+
+    # Unpublish pack if published and now has unrecorded words
+    pack_unpublished = False
+    pack = db.execute('SELECT published FROM pack WHERE id = ?', (pack_id,)).fetchone()
+    if pack and pack['published']:
+        missing = db.execute('''
+            SELECT COUNT(*) as c FROM word w JOIN item i ON i.id = w.item_id
+            WHERE i.pack_id = ? AND NOT EXISTS (SELECT 1 FROM recording r WHERE r.word_id = w.id)
+        ''', (pack_id,)).fetchone()['c']
+        if missing > 0:
+            db.execute('UPDATE pack SET published = 0 WHERE id = ?', (pack_id,))
+            db.commit()
+            pack_unpublished = True
+
+    db.close()
+    return jsonify({'ok': True, 'item_deleted': item_deleted, 'pack_unpublished': pack_unpublished})
+
+
+@app.route('/api/recording/<int:rec_id>/delete', methods=['POST'])
+def api_delete_recording_json(rec_id):
+    db = get_db()
+    rec = db.execute('''
+        SELECT r.*, w.id as word_id, w.item_id, i.pack_id
+        FROM recording r JOIN word w ON w.id = r.word_id JOIN item i ON i.id = w.item_id
+        WHERE r.id = ?
+    ''', (rec_id,)).fetchone()
+    if not rec:
+        db.close()
+        return jsonify({'error': 'Not found'}), 404
+    try: os.remove(rec['file_path'])
+    except OSError: pass
+    db.execute('DELETE FROM recording WHERE id = ?', (rec_id,))
+    db.commit()
+    db.close()
+    return jsonify({'ok': True})
+
+
 # ── End User ─────────────────────────────────────────────────────────────────
 
 @app.route('/user/')

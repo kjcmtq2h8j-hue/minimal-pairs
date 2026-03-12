@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Browse — Superuser{% endblock %}
+
+{% block head %}
+<style>
+  /* Override main constraints for full-width browse layout */
+  main { max-width: none !important; padding: 0 !important; }
+</style>
+{% endblock %}
+
+{% block nav %}
+<nav class="breadcrumb">
+  <a href="/">Home</a><span class="sep"></span>
+  <a href="/superuser/">Superuser</a><span class="sep"></span>
+  Browse
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="browse-layout">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside class="browse-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Packs</div>
+      <button class="sidebar-pack-btn active" data-pack-id="">All Packs</button>
+      {% for pack in packs %}
+      <button class="sidebar-pack-btn" data-pack-id="{{ pack.id }}">
+        {{ pack.name }}
+        {% if pack.published %}
+          <span class="badge badge-green" style="float:right;font-size:.7rem;">✓</span>
+        {% endif %}
+      </button>
+      {% endfor %}
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Filters</div>
+
+      <label class="sidebar-label" for="browse-search">Search word</label>
+      <input id="browse-search" type="text" class="browse-filter-input" placeholder="Type to filter…">
+
+      <label class="sidebar-label" style="margin-top:.75rem;">
+        <input id="filter-no-rec" type="checkbox" style="margin-right:.4rem;">
+        No recordings only
+      </label>
+
+      <label class="sidebar-label" for="filter-speaker" style="margin-top:.75rem;">Speaker</label>
+      <select id="filter-speaker" class="browse-filter-input">
+        <option value="">All speakers</option>
+        {% for sp in speaker_labels %}
+        <option value="{{ sp | e }}">{{ sp | e }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </aside>
+
+  <!-- ── Main content ───────────────────────────────────────── -->
+  <div class="browse-main">
+    <div class="browse-toolbar">
+      <h1 style="font-size:1.2rem; margin:0;">Browse Words</h1>
+      <span id="browse-stats" class="text-muted" style="font-size:.88rem;"></span>
+      <a href="/superuser/" class="btn btn-outline btn-sm" style="margin-left:auto;">← Superuser Home</a>
+    </div>
+
+    <div class="browse-table-wrap">
+      <table class="browse-table">
+        <thead>
+          <tr>
+            <th style="width:30%">Word</th>
+            <th style="width:15%">Recordings</th>
+            <th style="width:25%">Speakers</th>
+            <th style="width:30%">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="browse-tbody">
+          <tr><td colspan="4" class="browse-loading">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── Recording modal ───────────────────────────────────────── -->
+<div id="rec-modal-overlay" class="modal-overlay" hidden>
+  <div class="modal-box">
+    <div class="modal-header">
+      <span>Add Recording</span>
+      <button id="modal-close-btn" class="modal-close-btn">✕</button>
+    </div>
+    <div id="modal-word-label" class="modal-word-label">—</div>
+    <div id="modal-speaker-display" class="session-speaker-chip" style="margin-bottom:.75rem;"></div>
+
+    <button id="modal-rec-btn" class="record-btn" style="margin:0 auto 1rem;" title="Record / Stop">
+      <span id="modal-rec-label">🎙</span>
+    </button>
+    <div id="modal-status" class="text-muted" style="font-size:.88rem; min-height:1.3em; text-align:center;"></div>
+
+    <div id="modal-preview-section" hidden style="margin-top:.75rem;">
+      <audio id="modal-preview-audio" controls class="preview-audio w-full"></audio>
+      <div class="session-nav mt-1">
+        <button id="modal-rerecord-btn" class="btn btn-grey">Re-record</button>
+        <button id="modal-save-btn" class="btn btn-success">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/record.js') }}"></script>
+<script>
+  const BROWSE_SPEAKER_LABELS = {{ speaker_labels | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/browse.js') }}"></script>
+{% endblock %}
