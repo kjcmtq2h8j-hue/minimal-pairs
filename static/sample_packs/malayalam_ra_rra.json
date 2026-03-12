@@ -1,0 +1,16 @@
+{
+  "name": "Malayalam ര vs റ Contrasts",
+  "description": "Minimal pairs contrasting the Malayalam rhotics ര and റ. Mix of real words and nonce words.",
+  "items": [
+    { "words": ["കര", "കറ"] },
+    { "words": ["കരി", "കറി"] },
+    { "words": ["മര", "മറ"] },
+    { "words": ["തര", "തറ"] },
+    { "words": ["പര", "പറ"] },
+    { "words": ["ഇര", "ഇറ"] },
+    { "words": ["ഉര", "ഉറ"] },
+    { "words": ["ചര", "ചറ"] },
+    { "words": ["നര", "നറ"] },
+    { "words": ["ഹര", "ഹറ"] }
+  ]
+}

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Recording Session — {{ pack.name }}{% endblock %}
+
+{% block nav %}
+<nav class="breadcrumb">
+  <a href="/">Home</a>
+  <span class="sep"></span>
+  <a href="/superuser/">Superuser</a>
+  <span class="sep"></span>
+  <a href="/superuser/pack/{{ pack.id }}">{{ pack.name }}</a>
+  <span class="sep"></span>
+  Recording Session
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="session-shell">
+
+  {# ── Speaker selection screen ── #}
+  <div id="setup-screen" class="session-setup">
+    <h1 style="margin-bottom:.15rem;">🎙 Recording Session</h1>
+    <p class="text-muted mb-2">{{ pack.name }}</p>
+
+    <h2 style="margin-top:1.25rem; margin-bottom:.75rem; text-align:left;">Who is recording?</h2>
+
+    {# Existing speaker list #}
+    <div id="speaker-list">
+      {% if speakers %}
+        {% for s in speakers %}
+        <div class="speaker-profile-row" data-speaker-id="{{ s.id }}" data-speaker-name="{{ s.name | e }}">
+          <button class="speaker-select-btn">{{ s.name | e }}</button>
+          <button class="speaker-delete-btn" data-id="{{ s.id }}" title="Delete profile">✕</button>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted" id="no-speakers-msg" style="margin:.25rem 0 .75rem;">No speakers yet — create one below.</p>
+      {% endif %}
+    </div>
+
+    {# New speaker input #}
+    <div class="new-speaker-row mt-1">
+      <input id="new-speaker-input" type="text" class="speaker-input" placeholder="New speaker name…">
+      <button id="create-speaker-btn" class="btn btn-outline">+ Add</button>
+    </div>
+
+    {# Selected indicator #}
+    <div id="selected-indicator" class="selected-speaker-indicator mt-2" hidden>
+      Recording as: <strong id="selected-name-display"></strong>
+    </div>
+
+    <button id="start-session-btn" class="btn btn-primary btn-lg w-full mt-2" disabled>
+      Start Recording →
+    </button>
+    <div style="margin-top:.75rem;">
+      <a href="/superuser/pack/{{ pack.id }}" class="btn btn-grey">Cancel</a>
+    </div>
+  </div>
+
+  {# ── Recording screen ── #}
+  <div id="record-screen" class="session-card" hidden>
+
+    <div id="session-speaker-display" class="session-speaker-chip"></div>
+    <div id="session-progress" class="progress-label mt-1"></div>
+    <div id="rec-tier-display" class="rec-tier-hint"></div>
+
+    <div id="session-word-display" class="word-display">…</div>
+
+    <button id="rec-btn" class="record-btn" title="Record / Stop">
+      <span id="rec-btn-label">🎙 Record</span>
+    </button>
+
+    <div id="status-msg" class="text-muted mt-1" style="min-height:1.4em; font-size:.9rem;"></div>
+
+    {# Preview section #}
+    <div id="preview-section" hidden style="margin-top:1rem;">
+      <audio id="preview-audio" controls class="preview-audio w-full"></audio>
+      <div class="session-nav mt-1">
+        <button id="rerecord-btn" class="btn btn-grey">Re-record</button>
+        <button id="save-btn" class="btn btn-success">Save &amp; Next →</button>
+      </div>
+    </div>
+
+    <div class="session-nav mt-2">
+      <button id="skip-btn" class="btn btn-grey btn-sm">Skip word</button>
+      <button id="exit-btn" class="btn btn-outline btn-sm">Exit Session</button>
+    </div>
+  </div>
+
+  {# ── Done screen ── #}
+  <div id="done-screen" class="session-setup" hidden style="text-align:center;">
+    <div style="font-size:3rem; margin-bottom:.75rem;">✅</div>
+    <h2>All done!</h2>
+    <p id="done-msg" class="text-muted mt-1 mb-2"></p>
+    <a href="/superuser/pack/{{ pack.id }}" class="btn btn-primary">Back to Pack</a>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const SESSION_PACK_ID = {{ pack.id }};
+  const INITIAL_SPEAKERS = {{ speakers | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/record.js') }}"></script>
+{% endblock %}

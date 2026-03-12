@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}{{ word.label }} — Recordings{% endblock %}
+
+{% block nav %}
+<nav class="breadcrumb">
+  <a href="/">Home</a>
+  <span class="sep"></span>
+  <a href="/superuser/">Superuser</a>
+  <span class="sep"></span>
+  <a href="/superuser/pack/{{ pack.id }}">{{ pack.name }}</a>
+  <span class="sep"></span>
+  {{ word.label }}
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="pack-header">
+  <div>
+    <div class="pack-title" style="font-size:2.5rem;">{{ word.label }}</div>
+    <div class="text-muted" style="font-size:.9rem; margin-top:.25rem;">
+      Part of item with:
+      {% for s in siblings %}
+        {% if s.id != word.id %}
+          <a href="/superuser/word/{{ s.id }}">{{ s.label }}</a>{% if not loop.last %}, {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <div>
+    <span id="rec-count-badge"
+          data-count="{{ recordings|length }}"
+          class="badge {{ 'badge-green' if recordings else 'badge-red' }}">
+      {{ recordings|length }} recording{{ 's' if recordings|length != 1 }}
+    </span>
+  </div>
+</div>
+
+{# ── Existing recordings ── #}
+<div class="card">
+  <h2 class="mb-1">Recordings</h2>
+  {% if recordings %}
+    <ul class="rec-list" id="rec-list">
+      {% for rec in recordings %}
+      <li class="rec-item" data-rec-id="{{ rec.id }}">
+        <audio controls src="{{ url_for('static', filename='audio/' + rec.file_path.split('/')[-1]) }}"
+               class="preview-audio" style="flex:1; min-width:0;"></audio>
+        <span class="rec-meta">
+          {% if rec.speaker_label %}
+            👤 {{ rec.speaker_label }}
+          {% else %}
+            <em>No speaker label</em>
+          {% endif %}
+          &nbsp;·&nbsp; {{ rec.created_at[:10] }}
+        </span>
+        <form method="POST" action="/superuser/recording/{{ rec.id }}/delete" style="margin-left:auto;">
+          <input type="hidden" name="back" value="{{ request.path }}">
+          <button type="submit" class="btn btn-danger btn-sm"
+                  onclick="return confirm('Delete this recording?')">Delete</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <ul class="rec-list" id="rec-list"></ul>
+    <p class="text-muted" style="padding:.5rem 0;">No recordings yet.</p>
+  {% endif %}
+</div>
+
+{# ── Add recording ── #}
+<div class="card">
+  <h2 class="mb-1">Add Recording</h2>
+  <label for="inline-speaker-label">Speaker label <span class="text-muted">(optional)</span></label>
+  <input id="inline-speaker-label" type="text" class="speaker-input"
+         placeholder="e.g. Speaker 2, Female adult, …">
+
+  <div class="flex-row mt-1">
+    <button id="inline-rec-btn" class="btn btn-danger">🎙 Record New</button>
+  </div>
+
+  <div id="inline-status" class="text-muted mt-1" style="min-height:1.3em; font-size:.9rem;"></div>
+
+  <div id="inline-preview-section" hidden style="margin-top:1rem;">
+    <audio id="inline-preview-audio" controls class="preview-audio w-full"></audio>
+    <div class="flex-row mt-1">
+      <button id="inline-rerecord-btn" class="btn btn-grey">Re-record</button>
+      <button id="inline-save-btn" class="btn btn-success">Save Recording</button>
+    </div>
+  </div>
+</div>
+
+<div class="mt-2">
+  <a href="/superuser/pack/{{ pack.id }}" class="btn btn-grey">← Back to Pack</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>const WORD_ID = {{ word.id }};</script>
+<script src="{{ url_for('static', filename='js/record.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Superuser — Packs{% endblock %}
+
+{% block nav %}
+<nav class="breadcrumb">
+  <a href="/">Home</a>
+  <span class="sep"></span>
+  Superuser
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="pack-header">
+  <h1>Packs</h1>
+</div>
+
+<div class="card">
+  <h2 class="mb-1">Import Pack from JSON</h2>
+  <p class="text-muted mb-2">Upload a JSON file defining the pack structure. Audio is added inside the app after import.</p>
+  <form method="POST" action="/superuser/import" enctype="multipart/form-data">
+    <div class="flex-row">
+      <input type="file" name="file" accept=".json,application/json" required
+             style="flex:1; padding:.45rem; border:1.5px solid var(--grey-light); border-radius:8px;">
+      <button type="submit" class="btn btn-primary">Import</button>
+    </div>
+  </form>
+  <details style="margin-top:1rem;">
+    <summary style="cursor:pointer; font-size:.88rem; color:var(--text-muted);">JSON format reference</summary>
+    <pre style="margin-top:.5rem; padding:.75rem; background:#f8fafc; border-radius:8px; font-size:.82rem; overflow-x:auto;">{
+  "name": "Pack Name",
+  "description": "Optional description",
+  "items": [
+    { "words": ["word1", "word2"] },
+    { "words": ["wordA", "wordB", "wordC"] }
+  ]
+}</pre>
+  </details>
+</div>
+
+{% if packs %}
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pack in packs %}
+      <tr>
+        <td><a href="/superuser/pack/{{ pack.id }}"><strong>{{ pack.name }}</strong></a></td>
+        <td>
+          {% if pack.published %}
+            <span class="badge badge-green">Published</span>
+          {% else %}
+            <span class="badge badge-grey">Draft</span>
+          {% endif %}
+        </td>
+        <td class="text-muted" style="font-size:.85rem;">{{ pack.created_at[:10] }}</td>
+        <td style="text-align:right;">
+          <a href="/superuser/pack/{{ pack.id }}" class="btn btn-outline btn-sm">Manage</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card text-center" style="color:var(--text-muted); padding:2.5rem;">
+  No packs yet. Import one above.
+</div>
+{% endif %}
+{% endblock %}

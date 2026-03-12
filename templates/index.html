@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Minimal Pairs — Home{% endblock %}
+
+{% block content %}
+<div style="text-align:center; margin-top: 2rem;">
+  <h1 style="font-size:1.8rem; margin-bottom:.5rem;">Minimal Pairs Training</h1>
+  <p class="text-muted mb-2">Select your role to continue.</p>
+</div>
+
+<div class="home-grid">
+  <a href="/superuser/" class="home-card">
+    <div class="icon">🛠</div>
+    <h2>Superuser</h2>
+    <p>Import packs, record audio, manage content.</p>
+  </a>
+  <a href="/user/" class="home-card">
+    <div class="icon">🎧</div>
+    <h2>Training</h2>
+    <p>Practise listening with spaced repetition.</p>
+  </a>
+</div>
+{% endblock %}

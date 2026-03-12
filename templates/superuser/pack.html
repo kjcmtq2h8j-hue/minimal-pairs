@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}{{ pack.name }} — Superuser{% endblock %}
+
+{% block nav %}
+<nav class="breadcrumb">
+  <a href="/">Home</a>
+  <span class="sep"></span>
+  <a href="/superuser/">Superuser</a>
+  <span class="sep"></span>
+  {{ pack.name }}
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="pack-header">
+  <div>
+    <div class="pack-title">{{ pack.name }}</div>
+    {% if pack.description %}
+      <div class="pack-desc">{{ pack.description }}</div>
+    {% endif %}
+  </div>
+  <div class="flex-row">
+    <a href="/superuser/pack/{{ pack.id }}/session" class="btn btn-primary">🎙 Recording Session</a>
+    <form method="POST" action="/superuser/pack/{{ pack.id }}/delete"
+          onsubmit="return confirm('Delete this pack and all its recordings? This cannot be undone.')">
+      <button type="submit" class="btn btn-danger btn-sm">Delete Pack</button>
+    </form>
+  </div>
+</div>
+
+{# ── Publish bar ── #}
+<div class="publish-bar">
+  <div>
+    <strong>Status:</strong>
+    {% if pack.published %}
+      <span class="badge badge-green">Published</span>
+    {% else %}
+      <span class="badge badge-grey">Draft (not visible to trainees)</span>
+    {% endif %}
+  </div>
+  <div class="flex-row">
+    {% if pack.published %}
+      <form method="POST" action="/superuser/pack/{{ pack.id }}/publish">
+        <button type="submit" class="btn btn-grey">Unpublish</button>
+      </form>
+    {% else %}
+      {% if all_have_recordings %}
+        <form method="POST" action="/superuser/pack/{{ pack.id }}/publish">
+          <button type="submit" class="btn btn-success">Publish Pack</button>
+        </form>
+      {% else %}
+        <button class="btn btn-success" disabled title="All words must have at least one recording before publishing.">
+          Publish Pack
+        </button>
+        <span class="reason">⚠ Some words have no recordings — record them first.</span>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+{# ── Items ── #}
+{% if items %}
+  <p class="text-muted mb-1">{{ items|length }} item{{ 's' if items|length != 1 }} — click a word to manage its recordings.</p>
+
+  {% for item in items %}
+  <div class="item-block">
+    <div class="item-header">
+      <span>Item {{ loop.index }}</span>
+      <form method="POST" action="/superuser/item/{{ item.id }}/delete"
+            onsubmit="return confirm('Delete this item and all its recordings? SRS progress for this item will also be cleared.')">
+        <button type="submit" class="btn btn-danger btn-sm">Delete Item</button>
+      </form>
+    </div>
+
+    {% for word in item.words %}
+    <div class="word-row">
+      <span class="word-label">{{ word.label }}</span>
+      <div class="word-actions">
+        {% if word.rec_count == 0 %}
+          <span class="badge badge-red">⚠ No recordings</span>
+        {% else %}
+          <span class="badge badge-green">{{ word.rec_count }} recording{{ 's' if word.rec_count != 1 }}</span>
+        {% endif %}
+        <a href="/superuser/word/{{ word.id }}" class="btn btn-outline btn-sm">Manage</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+
+{% else %}
+  <div class="card text-center" style="color:var(--text-muted); padding:2rem;">
+    This pack has no items. All items were deleted, or the import was empty.
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Training — Choose Pack{% endblock %}
+
+{% block nav %}
+<nav class="breadcrumb">
+  <a href="/">Home</a>
+  <span class="sep"></span>
+  Training
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="pack-header">
+  <h1>Choose a Pack to Practise</h1>
+</div>
+
+{% if packs %}
+  <div style="display:grid; gap:1rem;">
+    {% for pack in packs %}
+    <a href="/user/train/{{ pack.id }}" style="text-decoration:none;">
+      <div class="card" style="cursor:pointer; transition: box-shadow .2s, transform .15s;"
+           onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,.12)'; this.style.transform='translateY(-2px)'"
+           onmouseout="this.style.boxShadow=''; this.style.transform=''">
+        <div class="flex-row" style="justify-content:space-between; align-items:flex-start;">
+          <div>
+            <strong style="font-size:1.1rem;">{{ pack.name }}</strong>
+            {% if pack.description %}
+              <p class="text-muted mt-1" style="font-size:.9rem;">{{ pack.description }}</p>
+            {% endif %}
+          </div>
+          <div style="text-align:right; flex-shrink:0; margin-left:.75rem;">
+            <span class="badge badge-blue">{{ pack.item_count }} item{{ 's' if pack.item_count != 1 }}</span>
+          </div>
+        </div>
+        <div style="margin-top:1rem; text-align:right;">
+          <span class="btn btn-primary btn-sm">Start Practising →</span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card text-center" style="color:var(--text-muted); padding:2.5rem;">
+    No published packs available yet. Ask the Superuser to publish a pack.
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Training — {{ pack.name }}{% endblock %}
+
+{% block nav %}
+<nav class="breadcrumb">
+  <a href="/">Home</a>
+  <span class="sep"></span>
+  <a href="/user/">Training</a>
+  <span class="sep"></span>
+  {{ pack.name }}
+</nav>
+{% endblock %}
+
+{% block content %}
+<div id="train-shell" class="train-shell">
+
+  {# ── Loading ── #}
+  <div id="phase-loading" class="train-card">
+    <p class="loading-msg">Loading…</p>
+  </div>
+
+  {# ── Present / Answer / Feedback ── #}
+  <div id="phase-present" class="train-card" hidden>
+
+    <div class="audio-area">
+      <div class="phase-label">Listen and identify the word</div>
+      <div id="audio-status" class="audio-status">Playing…</div>
+      <button id="replay-btn" class="replay-btn" disabled>▶ Replay</button>
+    </div>
+
+    <div id="choices" class="choices">
+      {# Populated by JS #}
+    </div>
+
+    <div id="feedback-banner" class="feedback-banner" hidden></div>
+
+  </div>
+
+  {# ── Discrimination phase ── #}
+  <div id="phase-discrim" class="train-card" hidden>
+    <div class="phase-label">Compare — tap any word to hear it</div>
+    <div class="discrim-label">You can listen to each word as many times as you like.</div>
+
+    <div id="discrim-grid" class="discrim-grid">
+      {# Populated by JS #}
+    </div>
+
+    <button id="next-btn" class="btn btn-primary btn-lg w-full">Next →</button>
+  </div>
+
+  {# ── Done ── #}
+  <div id="phase-done" class="train-card" hidden>
+    <div class="done-msg">
+      <div style="font-size:3rem; margin-bottom:.75rem;">🎉</div>
+      <h2>Session complete!</h2>
+      <p class="text-muted mt-1 mb-2">All due items for today have been reviewed.</p>
+      <a href="/user/" class="btn btn-primary">Choose Another Pack</a>
+      <div style="margin-top:.75rem;">
+        <a href="/user/train/{{ pack.id }}" class="btn btn-outline">Continue Practising</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>const PACK_ID = {{ pack.id }};</script>
+<script src="{{ url_for('static', filename='js/train.js') }}"></script>
+{% endblock %}
