@@ -30,7 +30,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS word (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             item_id INTEGER NOT NULL REFERENCES item(id) ON DELETE CASCADE,
-            label TEXT NOT NULL
+            label TEXT NOT NULL,
+            word_type TEXT NOT NULL DEFAULT 'real'
         );
 
         CREATE TABLE IF NOT EXISTS recording (
@@ -38,6 +39,7 @@ def init_db():
             word_id INTEGER NOT NULL REFERENCES word(id) ON DELETE CASCADE,
             file_path TEXT NOT NULL,
             speaker_label TEXT,
+            session_id TEXT,
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
 
@@ -45,10 +47,6 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             item_id INTEGER NOT NULL REFERENCES item(id) ON DELETE CASCADE,
             stimulus_word_id INTEGER NOT NULL REFERENCES word(id) ON DELETE CASCADE,
-            srs_interval REAL NOT NULL DEFAULT 1,
-            srs_ease REAL NOT NULL DEFAULT 2.5,
-            srs_due_date TEXT NOT NULL DEFAULT (date('now')),
-            srs_repetitions INTEGER NOT NULL DEFAULT 0,
             last_reviewed_at TEXT,
             UNIQUE(item_id, stimulus_word_id)
         );
@@ -57,6 +55,21 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL UNIQUE,
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS training_state (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            pack_id INTEGER NOT NULL REFERENCES pack(id) ON DELETE CASCADE,
+            phase INTEGER NOT NULL DEFAULT 1,
+            phase_advanced_at TEXT,
+            mastered INTEGER NOT NULL DEFAULT 0,
+            mastered_at TEXT,
+            session_count_this_week INTEGER NOT NULL DEFAULT 0,
+            total_seconds_this_week INTEGER NOT NULL DEFAULT 0,
+            week_start TEXT,
+            last_session_date TEXT,
+            last_session_seconds INTEGER NOT NULL DEFAULT 0,
+            UNIQUE(pack_id)
         );
 
         CREATE TABLE IF NOT EXISTS trial_log (

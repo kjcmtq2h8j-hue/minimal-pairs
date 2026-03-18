@@ -241,9 +241,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') doCreateSpeaker();
   });
 
+  // Typing a name in the input also enables the Start button directly
+  newSpeakerInput.addEventListener('input', () => {
+    if (!selectedSpeaker && newSpeakerInput.value.trim()) {
+      startBtn.disabled = false;
+    } else if (!selectedSpeaker && !newSpeakerInput.value.trim()) {
+      startBtn.disabled = true;
+    }
+  });
+
   // ── Start session ─────────────────────────────────────────────────────────
 
   startBtn.addEventListener('click', async () => {
+    // If no speaker selected but name typed, create-and-select first
+    if (!selectedSpeaker && newSpeakerInput.value.trim()) {
+      await doCreateSpeaker();
+      if (!selectedSpeaker) return; // creation failed
+    }
     if (!selectedSpeaker) return;
 
     startBtn.disabled        = true;

@@ -32,8 +32,49 @@
             <span class="badge badge-blue">{{ pack.item_count }} item{{ 's' if pack.item_count != 1 }}</span>
           </div>
         </div>
+
+        {# ── Phase + Mode + Schedule display ── #}
+        <div class="pack-training-info mt-1">
+          <div class="flex-row" style="gap:.5rem; flex-wrap:wrap;">
+            {% if pack.mastered %}
+              <span class="badge badge-green">Mastered</span>
+              <span class="badge badge-outline">Review</span>
+            {% elif pack.phase == 1 %}
+              <span class="badge badge-amber">Synthetic</span>
+              <span class="badge badge-outline">Active</span>
+            {% else %}
+              <span class="badge badge-blue">All pairs</span>
+              <span class="badge badge-outline">Active</span>
+            {% endif %}
+            {% if pack.total_trials > 0 %}
+              <span class="badge badge-grey">{{ pack.total_trials }} trials</span>
+            {% endif %}
+          </div>
+
+          <div class="schedule-display mt-1">
+            <span class="schedule-label">This week:</span>
+            <span class="schedule-dots">
+              {% if pack.sessions_this_week >= 1 %}
+                <span class="schedule-dot filled"></span>
+              {% else %}
+                <span class="schedule-dot"></span>
+              {% endif %}
+              {% if not pack.mastered %}
+                {% if pack.sessions_this_week >= 2 %}
+                  <span class="schedule-dot filled"></span>
+                {% else %}
+                  <span class="schedule-dot"></span>
+                {% endif %}
+              {% endif %}
+            </span>
+            <span class="schedule-text text-muted">
+              {{ pack.sessions_this_week }} / {{ pack.session_target }} session{{ 's' if pack.session_target != 1 }}
+            </span>
+          </div>
+        </div>
+
         <div style="margin-top:1rem; text-align:right;">
-          <span class="btn btn-primary btn-sm">Start Practising →</span>
+          <span class="btn btn-primary btn-sm">{% if pack.mastered %}Start Review →{% else %}Start Practising →{% endif %}</span>
         </div>
       </div>
     </a>

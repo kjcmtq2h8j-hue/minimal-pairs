@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% block title %}Export Recording Session — {{ pack.name }}{% endblock %}
+
+{% block head %}
+<style>
+  .export-card   { max-width: 700px; }
+  .step          { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+  .step-num      {
+    flex-shrink: 0; width: 2rem; height: 2rem;
+    background: var(--primary, #6c63ff); color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: .9rem;
+  }
+  .step-body     { flex: 1; }
+  .step-body h3  { font-size: 1rem; font-weight: 600; margin-bottom: .3rem; }
+  .step-body p   { font-size: .9rem; color: var(--text-muted, #718096); line-height: 1.55; }
+
+  .url-box {
+    display: flex; gap: .5rem; align-items: stretch;
+    margin-top: .6rem;
+  }
+  .url-box input {
+    flex: 1; padding: .6rem .85rem;
+    border: 1.5px solid var(--grey-light, #e2e8f0);
+    border-radius: 8px; font-size: .82rem; font-family: monospace;
+    background: #f8fafc; color: var(--text, #2d3748);
+    min-width: 0; /* allow shrink */
+  }
+  .url-box .btn { white-space: nowrap; }
+
+  .hosting-options { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .65rem; }
+  .host-card {
+    border: 1.5px solid var(--grey-light, #e2e8f0); border-radius: 10px;
+    padding: .9rem 1rem;
+  }
+  .host-card h4   { font-size: .9rem; font-weight: 600; margin-bottom: .2rem; }
+  .host-card p    { font-size: .82rem; color: var(--text-muted, #718096); line-height: 1.45; }
+  .host-card a    { font-size: .82rem; }
+
+  .custom-url-row { display: flex; gap: .5rem; align-items: center; margin-top: .65rem; }
+  .custom-url-row input { flex: 1; }
+
+  .info-box {
+    background: #f0f4ff; border: 1px solid #c3d0ff; border-radius: 10px;
+    padding: .85rem 1rem; font-size: .88rem; line-height: 1.55;
+    color: #3a4a8a; margin-top: 1rem;
+  }
+
+  @media (max-width: 540px) {
+    .hosting-options { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block nav %}
+<nav class="breadcrumb">
+  <a href="/">Home</a><span class="sep"></span>
+  <a href="/superuser/">Superuser</a><span class="sep"></span>
+  <a href="/superuser/pack/{{ pack.id }}">{{ pack.name }}</a><span class="sep"></span>
+  Export Recording Session
+</nav>
+{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: .25rem;">Export Recording Session</h1>
+<p class="text-muted mb-2" style="font-size:.92rem;">
+  Share a link with a native speaker so they can record all {{ word_count }} words in their browser — no software needed.
+</p>
+
+<div class="card export-card">
+
+  <!-- Step 1: Test locally -->
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h3>Test locally</h3>
+      <p>Open this link on <em>your own</em> computer to preview the recorder before sharing.</p>
+      <div class="url-box">
+        <input type="text" id="local-url" readonly
+               value="{{ local_url }}">
+        <button class="btn btn-outline btn-sm" onclick="copyUrl('local-url', this)">Copy</button>
+        <a href="{{ local_url }}" target="_blank" class="btn btn-primary btn-sm">Open ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Host the recorder (one-time setup) -->
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h3>Host the recorder page <span style="font-weight:400;color:var(--text-muted);font-size:.85rem;">(one-time setup)</span></h3>
+      <p>
+        The native speaker's browser needs HTTPS to access the microphone, so the recorder page
+        must be on the internet. Choose a free option below — you only do this once.
+      </p>
+      <div class="hosting-options">
+        <div class="host-card">
+          <h4>Netlify Drop <span style="font-size:.75rem;color:#38a169;">✓ Easiest</span></h4>
+          <p>Drag the <code>recorder/index.html</code> file onto <a href="https://app.netlify.com/drop" target="_blank">app.netlify.com/drop</a>. Get a live HTTPS URL in seconds.</p>
+        </div>
+        <div class="host-card">
+          <h4>GitHub Pages</h4>
+          <p>Create a repo, upload <code>index.html</code> to it, enable Pages in Settings → Pages. Gives a stable URL like <code>yourname.github.io/recorder</code>.</p>
+        </div>
+      </div>
+      <p style="margin-top:.65rem; font-size:.85rem;">
+        The file to upload is at:
+        <code style="background:#f0f4ff; padding:.1em .45em; border-radius:4px;">
+          minimal_pairs/static/recorder/index.html
+        </code>
+      </p>
+    </div>
+  </div>
+
+  <!-- Step 3: Build the shareable link -->
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h3>Build the shareable link</h3>
+      <p>Paste your hosted URL below — the session data will be appended automatically.</p>
+      <div class="custom-url-row">
+        <input type="text" id="hosted-base"
+               placeholder="https://yourname.netlify.app"
+               oninput="buildShareUrl()">
+        <button class="btn btn-outline btn-sm" onclick="copyUrl('share-url', this)">Copy link</button>
+      </div>
+      <div class="url-box" style="margin-top:.5rem;">
+        <input type="text" id="share-url" readonly
+               placeholder="Shareable link will appear here…">
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Send link -->
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <h3>Send the link to the speaker</h3>
+      <p>
+        Share via WhatsApp, email, or any messaging app. The speaker opens the link,
+        enters their name, records each word one by one, then downloads a zip file
+        of their recordings to send back to you.
+      </p>
+      <div class="info-box">
+        📦 The session data ({{ word_count }} words) is embedded in the URL itself —
+        no server or database is involved on the speaker's side.
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5: Import -->
+  <div class="step" style="margin-bottom:0;">
+    <div class="step-num">5</div>
+    <div class="step-body">
+      <h3>Import their recordings</h3>
+      <p>Once the speaker sends back the zip file, import it here to attach all recordings to your pack.</p>
+      <a href="/superuser/import-recordings" class="btn btn-primary btn-sm" style="margin-top:.6rem; display:inline-flex;">
+        ⬆ Go to Import Recordings
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const MANIFEST_B64 = {{ manifest_b64 | tojson }};
+
+function buildShareUrl() {
+  let base = document.getElementById('hosted-base').value.trim().replace(/\/$/, '');
+  if (!base) {
+    document.getElementById('share-url').value = '';
+    return;
+  }
+  // Ensure it has a protocol
+  if (!/^https?:\/\//i.test(base)) base = 'https://' + base;
+  document.getElementById('share-url').value = base + '#' + MANIFEST_B64;
+}
+
+function copyUrl(inputId, btn) {
+  const val = document.getElementById(inputId).value;
+  if (!val || val.includes('will appear here')) {
+    btn.textContent = '✗ Nothing to copy';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+    return;
+  }
+  navigator.clipboard.writeText(val).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const inp = document.getElementById(inputId);
+    inp.select();
+    document.execCommand('copy');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+</script>
+{% endblock %}

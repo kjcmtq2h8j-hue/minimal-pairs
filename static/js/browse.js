@@ -80,6 +80,14 @@ function render() {
     // ── Item group header ──
     const hdr = document.createElement('tr');
     hdr.className = 'browse-group-header';
+    // Accuracy badge
+    let accBadge = '';
+    if (item.accuracy !== null && item.accuracy !== undefined) {
+      const accClass = item.accuracy >= 85 ? 'accuracy-high' : item.accuracy >= 65 ? 'accuracy-mid' : 'accuracy-low';
+      accBadge = `<span class="accuracy-badge ${accClass}">${item.accuracy}% (${item.accuracy_trials})</span>`;
+    } else {
+      accBadge = '<span class="accuracy-badge accuracy-none">—</span>';
+    }
     hdr.innerHTML = `
       <td colspan="4">
         <span class="browse-pack-name">${escHtml(item.pack_name)}</span>
@@ -87,6 +95,7 @@ function render() {
         ${item.pack_published
           ? '<span class="badge badge-green">Published</span>'
           : '<span class="badge badge-grey">Draft</span>'}
+        ${accBadge}
       </td>`;
     tbody.appendChild(hdr);
 
@@ -105,6 +114,10 @@ function render() {
         <td>
           <span class="browse-word-label" data-word-id="${word.id}"
                 title="Click to rename">${escHtml(word.label)}</span>
+          <span class="word-type-badge word-type-${word.word_type || 'real'}"
+                data-word-id="${word.id}"
+                data-current-type="${word.word_type || 'real'}"
+                title="Click to change type">${word.word_type || 'real'}</span>
         </td>
         <td>
           <span class="badge ${recClass}" id="rec-badge-${word.id}">${word.rec_count} rec${word.rec_count !== 1 ? 's' : ''}</span>
@@ -204,6 +217,28 @@ tbody.addEventListener('click', async e => {
     const data = await res.json();
     if (!data.ok) { showToast('Delete failed — please try again.', 'error'); return; }
     await loadData();
+    return;
+  }
+
+  // Toggle word type badge
+  const typeBadge = e.target.closest('.word-type-badge');
+  if (typeBadge) {
+    const wordId = typeBadge.dataset.wordId;
+    const cycle = { 'real': 'synthetic', 'synthetic': 'mixed', 'mixed': 'real' };
+    const current = typeBadge.dataset.currentType || 'real';
+    const next = cycle[current] || 'real';
+    const res = await fetch(`/api/word/${wordId}/type`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ word_type: next }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      typeBadge.textContent = next;
+      typeBadge.dataset.currentType = next;
+      typeBadge.className = `word-type-badge word-type-${next}`;
+      showToast(`Word type set to "${next}"`, 'success');
+    }
     return;
   }
 

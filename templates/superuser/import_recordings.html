@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}Import Recordings{% endblock %}
+
+{% block head %}
+<style>
+  .import-card { max-width: 620px; }
+
+  .drop-zone {
+    border: 2.5px dashed var(--grey-light, #e2e8f0);
+    border-radius: 12px; padding: 2.5rem 1.5rem;
+    text-align: center; cursor: pointer;
+    transition: border-color .2s, background .2s;
+    margin-bottom: 1.2rem;
+  }
+  .drop-zone.dragover { border-color: #6c63ff; background: #f0f0ff; }
+  .drop-zone input[type=file] { display: none; }
+  .drop-zone .icon { font-size: 2.5rem; margin-bottom: .5rem; }
+  .drop-zone p { color: var(--text-muted, #718096); font-size: .9rem; }
+  .drop-zone .file-chosen { color: var(--text, #2d3748); font-weight: 600; font-size: .92rem; }
+
+  .field-row { margin-bottom: 1rem; }
+  .field-row label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: .35rem; }
+  .field-row input[type=text] {
+    width: 100%; padding: .65rem .9rem;
+    border: 1.5px solid var(--grey-light, #e2e8f0);
+    border-radius: 8px; font-size: .95rem;
+  }
+  .field-row .hint { font-size: .8rem; color: var(--text-muted, #718096); margin-top: .2rem; }
+
+  #result-box { margin-top: 1.5rem; display: none; }
+  .result-ok  {
+    background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 10px;
+    padding: 1rem 1.2rem; font-size: .92rem; color: #276749;
+  }
+  .result-err {
+    background: #fff5f5; border: 1px solid #feb2b2; border-radius: 10px;
+    padding: 1rem 1.2rem; font-size: .92rem; color: #822727;
+    margin-top: .75rem;
+  }
+  .result-err ul { padding-left: 1.2rem; margin-top: .4rem; }
+  .result-err li { font-size: .85rem; margin-top: .2rem; }
+
+  #submit-btn { width: 100%; }
+  #submit-btn:disabled { opacity: .5; }
+</style>
+{% endblock %}
+
+{% block nav %}
+<nav class="breadcrumb">
+  <a href="/">Home</a><span class="sep"></span>
+  <a href="/superuser/">Superuser</a><span class="sep"></span>
+  Import Recordings
+</nav>
+{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom:.25rem;">Import Recordings</h1>
+<p class="text-muted mb-2" style="font-size:.92rem;">
+  Upload a zip file sent back by a native speaker. Recordings are matched to words
+  automatically using the session manifest.
+</p>
+
+<div class="card import-card">
+
+  <!-- Drop zone -->
+  <div class="drop-zone" id="drop-zone" onclick="document.getElementById('zip-input').click()">
+    <input type="file" id="zip-input" accept=".zip">
+    <div class="icon">📦</div>
+    <p id="drop-label">Drag &amp; drop a <strong>recordings zip</strong> here, or click to choose</p>
+  </div>
+
+  <!-- Optional speaker override -->
+  <div class="field-row">
+    <label for="speaker-override">Speaker name override <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
+    <input type="text" id="speaker-override" placeholder="Leave blank to use name from zip">
+    <div class="hint">Use this if you want to standardise the name (e.g. the speaker typed a nickname).</div>
+  </div>
+
+  <button class="btn btn-primary" id="submit-btn" disabled onclick="submitImport()">
+    ⬆ Import Recordings
+  </button>
+
+  <!-- Result area -->
+  <div id="result-box">
+    <div class="result-ok" id="result-ok"></div>
+    <div class="result-err" id="result-err" style="display:none;"></div>
+  </div>
+
+</div>
+
+<script>
+let chosenFile = null;
+
+// ── Drop zone ────────────────────────────────────────────────────────────────
+const dropZone = document.getElementById('drop-zone');
+const zipInput = document.getElementById('zip-input');
+
+zipInput.addEventListener('change', () => {
+  if (zipInput.files[0]) setFile(zipInput.files[0]);
+});
+
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault(); dropZone.classList.add('dragover');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  const f = e.dataTransfer.files[0];
+  if (f && f.name.endsWith('.zip')) setFile(f);
+  else alert('Please drop a .zip file.');
+});
+
+function setFile(f) {
+  chosenFile = f;
+  document.getElementById('drop-label').innerHTML =
+    `<span class="file-chosen">📎 ${escHtml(f.name)}</span><br><span style="font-size:.8rem;color:var(--text-muted);">Click to change</span>`;
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Submit ────────────────────────────────────────────────────────────────────
+async function submitImport() {
+  if (!chosenFile) return;
+  const btn = document.getElementById('submit-btn');
+  btn.disabled    = true;
+  btn.textContent = '⏳ Importing…';
+
+  const fd = new FormData();
+  fd.append('zip_file', chosenFile);
+  const override = document.getElementById('speaker-override').value.trim();
+  if (override) fd.append('speaker_name', override);
+
+  try {
+    const resp = await fetch('/api/import-recordings', { method: 'POST', body: fd });
+    const data = await resp.json();
+
+    const resultBox = document.getElementById('result-box');
+    resultBox.style.display = 'block';
+
+    if (!resp.ok || data.error) {
+      document.getElementById('result-ok').style.display = 'none';
+      const errEl = document.getElementById('result-err');
+      errEl.style.display = 'block';
+      errEl.innerHTML = `<strong>Import failed:</strong> ${escHtml(data.error || 'Unknown error')}`;
+    } else {
+      const okEl = document.getElementById('result-ok');
+      okEl.style.display = 'block';
+      okEl.innerHTML =
+        `✅ <strong>${data.imported} recording${data.imported !== 1 ? 's' : ''} imported</strong>` +
+        (data.speaker ? ` for speaker <em>${escHtml(data.speaker)}</em>` : '') +
+        (data.skipped ? ` · ${data.skipped} skipped (word not in database)` : '');
+
+      if (data.errors && data.errors.length) {
+        const errEl = document.getElementById('result-err');
+        errEl.style.display = '';
+        errEl.innerHTML =
+          `⚠ <strong>${data.errors.length} warning${data.errors.length !== 1 ? 's' : ''}:</strong>` +
+          '<ul>' + data.errors.map(e => `<li>${escHtml(e)}</li>`).join('') + '</ul>';
+      } else {
+        document.getElementById('result-err').style.display = 'none';
+      }
+    }
+  } catch (e) {
+    document.getElementById('result-box').style.display  = 'block';
+    document.getElementById('result-ok').style.display   = 'none';
+    const errEl = document.getElementById('result-err');
+    errEl.style.display = 'block';
+    errEl.innerHTML = `<strong>Network error:</strong> ${escHtml(e.message)}`;
+  }
+
+  btn.disabled    = false;
+  btn.textContent = '⬆ Import Recordings';
+}
+</script>
+{% endblock %}

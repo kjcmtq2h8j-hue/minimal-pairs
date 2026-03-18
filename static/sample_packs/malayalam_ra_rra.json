@@ -1,16 +1,26 @@
 {
   "name": "Malayalam ര vs റ Contrasts",
-  "description": "Minimal pairs contrasting the Malayalam rhotics ര and റ. Mix of real words and nonce words.",
+  "description": "Minimal pairs contrasting the Malayalam rhotics ര (alveolar tap) and റ (retroflex/harder trill). Mix of real words and synthetic words.",
   "items": [
-    { "words": ["കര", "കറ"] },
-    { "words": ["കരി", "കറി"] },
-    { "words": ["മര", "മറ"] },
-    { "words": ["തര", "തറ"] },
-    { "words": ["പര", "പറ"] },
-    { "words": ["ഇര", "ഇറ"] },
-    { "words": ["ഉര", "ഉറ"] },
-    { "words": ["ചര", "ചറ"] },
-    { "words": ["നര", "നറ"] },
-    { "words": ["ഹര", "ഹറ"] }
+    { "words": ["കര", "കറ"], "notes": "real: shore/land — stain/sap" },
+    { "words": ["കരി", "കറി"], "notes": "real: charcoal — curry" },
+    { "words": ["മര", "മറ"], "notes": "real: tree/wood — screen/veil" },
+    { "words": ["തര", "തറ"], "notes": "real: kind/type — floor/ground" },
+    { "words": ["പര", "പറ"], "notes": "real: other/beyond — to say; drum; rice measure" },
+    { "words": ["ഇര", "ഇറ"], "notes": "real: prey/victim — eaves/descent" },
+    { "words": ["ഉര", "ഉറ"], "notes": "real: to rub/sharpen — sheath/scabbard" },
+    { "words": ["വര", "വറ"], "notes": "real: line/stripe/boon — to dry up/fry" },
+    { "words": ["അര", "അറ"], "notes": "real: half/waist — room/chamber" },
+    { "words": ["കുര", "കുറ"], "notes": "real: bark (of dog) — to decrease/shortfall" },
+    { "words": ["പുര", "പുറ"], "notes": "real: hut/house — outside/back" },
+    { "words": ["അരി", "അറി"], "notes": "real: rice — to know" },
+    { "words": ["കുരു", "കുറു"], "notes": "real: seed/pimple — short (prefix)" },
+    { "words": ["തിര", "തിറ"], "notes": "real: wave — skill/folk art form" },
+    { "words": ["നര", "നറ"], "notes": "mixed: grey hair — synthetic (cf. നറു = fragrant)" },
+    { "words": ["ചര", "ചറ"], "notes": "mixed: spy/agent — synthetic" },
+    { "words": ["ഹര", "ഹറ"], "notes": "mixed: Shiva/to destroy — synthetic" },
+    { "words": ["മുര", "മുറ"], "notes": "mixed: synthetic — order/method/turn" },
+    { "words": ["ചിര", "ചിറ"], "notes": "mixed: synthetic — dam/bund" },
+    { "words": ["ഗര", "ഗറ"], "notes": "synthetic pair" }
   ]
 }

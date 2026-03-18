@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minimal Pairs Training Application — Specification</title>
+<style>
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #1a1a1a;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  h1 {
+    font-size: 22pt;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #111;
+    border-bottom: 3px solid #111;
+    padding-bottom: 8px;
+  }
+  .subtitle {
+    font-size: 10pt;
+    color: #666;
+    margin-bottom: 30px;
+  }
+  h2 {
+    font-size: 15pt;
+    font-weight: 700;
+    margin-top: 28px;
+    margin-bottom: 10px;
+    color: #222;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 12pt;
+    font-weight: 700;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    color: #333;
+    page-break-after: avoid;
+  }
+  h4 {
+    font-size: 11pt;
+    font-weight: 700;
+    margin-top: 14px;
+    margin-bottom: 4px;
+    color: #444;
+    page-break-after: avoid;
+  }
+  p { margin-bottom: 8px; }
+  ul, ol { margin-bottom: 8px; padding-left: 24px; }
+  li { margin-bottom: 3px; }
+  strong { font-weight: 700; }
+  code {
+    font-family: 'Menlo', 'Consolas', monospace;
+    font-size: 9.5pt;
+    background: #f4f4f4;
+    padding: 1px 4px;
+    border-radius: 2px;
+  }
+  pre {
+    font-family: 'Menlo', 'Consolas', monospace;
+    font-size: 9pt;
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.4;
+    page-break-inside: avoid;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+    font-size: 10pt;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 5px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f0f0f0;
+    font-weight: 700;
+  }
+  .note {
+    background: #fffde7;
+    border-left: 3px solid #f9a825;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    font-size: 10pt;
+  }
+  .section-divider {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 24px 0;
+  }
+  .toc {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 16px 24px;
+    margin-bottom: 24px;
+  }
+  .toc h2 { border: none; margin-top: 0; font-size: 13pt; }
+  .toc ol { margin-bottom: 0; }
+  .toc li { margin-bottom: 2px; }
+  .toc a { color: #1a1a1a; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .algorithm-box {
+    background: #f0f7ff;
+    border: 1px solid #b3d4fc;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  @media print {
+    body { padding: 0; max-width: none; }
+    .toc { page-break-after: always; }
+    h2 { page-break-before: auto; }
+    .no-break { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Minimal Pairs Training Application</h1>
+<p class="subtitle">Technical Specification &mdash; March 2026</p>
+
+<div class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#schema">Database Schema</a></li>
+    <li><a href="#algorithm">Training Algorithm</a></li>
+    <li><a href="#session">Training Session</a></li>
+    <li><a href="#schedule">Weekly Training Schedule</a></li>
+    <li><a href="#content">Content Targets</a></li>
+    <li><a href="#json">JSON Import Format</a></li>
+    <li><a href="#api">API Routes</a></li>
+    <li><a href="#pages">Pages</a></li>
+    <li><a href="#recording">Recording System</a></li>
+    <li><a href="#reset">Progress Reset</a></li>
+    <li><a href="#files">File Structure</a></li>
+    <li><a href="#decisions">Design Decisions</a></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="overview">1. Overview</h2>
+
+<p>A locally-run offline web application for auditory perception training using minimal pairs. Built with Flask + SQLite, designed for a single end-user with a superuser managing content. The primary use case is training perception of Malayalam rhotics (<strong>&#xd30;</strong> alveolar tap vs <strong>&#xd31;</strong> retroflex trill), but the architecture supports any language contrast.</p>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="architecture">2. Architecture</h2>
+
+<ul>
+  <li><strong>Backend:</strong> Python / Flask, SQLite database (<code>minimal_pairs.db</code>)</li>
+  <li><strong>Frontend:</strong> Vanilla JS, server-rendered Jinja2 templates</li>
+  <li><strong>Audio:</strong> Browser MediaRecorder API &rarr; stored as WebM/OGG/M4A in <code>static/audio/</code></li>
+  <li><strong>No network dependency:</strong> runs entirely on localhost; no CDNs, no external APIs</li>
+</ul>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="schema">3. Database Schema</h2>
+
+<h3><code>pack</code></h3>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>id</td><td>INTEGER PK</td><td>Auto-increment</td></tr>
+  <tr><td>name</td><td>TEXT NOT NULL UNIQUE</td><td>Pack display name</td></tr>
+  <tr><td>description</td><td>TEXT</td><td>Optional description</td></tr>
+  <tr><td>published</td><td>INTEGER DEFAULT 0</td><td>1 = visible to end user</td></tr>
+  <tr><td>created_at</td><td>TEXT</td><td>ISO datetime</td></tr>
+</table>
+
+<h3><code>item</code></h3>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>id</td><td>INTEGER PK</td><td>Auto-increment</td></tr>
+  <tr><td>pack_id</td><td>INTEGER FK &rarr; pack</td><td>CASCADE delete</td></tr>
+  <tr><td>created_at</td><td>TEXT</td><td>ISO datetime</td></tr>
+</table>
+<p>An item represents one minimal pair (or tuple). Each item has 2+ words.</p>
+
+<h3><code>word</code></h3>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>id</td><td>INTEGER PK</td><td>Auto-increment</td></tr>
+  <tr><td>item_id</td><td>INTEGER FK &rarr; item</td><td>CASCADE delete</td></tr>
+  <tr><td>label</td><td>TEXT NOT NULL</td><td>Display label (e.g. "&#xd15;&#xd30;")</td></tr>
+  <tr><td>word_type</td><td>TEXT DEFAULT 'real'</td><td><code>'real'</code>, <code>'synthetic'</code>, or <code>'mixed'</code></td></tr>
+</table>
+
+<p><strong>Word types:</strong></p>
+<ul>
+  <li><strong>real</strong> &mdash; both words in the pair are real words in the target language</li>
+  <li><strong>synthetic</strong> &mdash; both words are nonsense/invented words (pure phonetic training)</li>
+  <li><strong>mixed</strong> &mdash; one word is real, the other is synthetic</li>
+</ul>
+
+<h3><code>recording</code></h3>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>id</td><td>INTEGER PK</td><td>Auto-increment</td></tr>
+  <tr><td>word_id</td><td>INTEGER FK &rarr; word</td><td>CASCADE delete</td></tr>
+  <tr><td>file_path</td><td>TEXT NOT NULL</td><td>Path to audio file on disk</td></tr>
+  <tr><td>speaker_label</td><td>TEXT</td><td>Name of the speaker</td></tr>
+  <tr><td>session_id</td><td>TEXT</td><td>Import session identifier (deduplication)</td></tr>
+  <tr><td>created_at</td><td>TEXT</td><td>ISO datetime</td></tr>
+</table>
+<p>Multiple recordings per word are supported. During training, one is selected at random.</p>
+
+<h3><code>directional_record</code></h3>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>id</td><td>INTEGER PK</td><td>Auto-increment</td></tr>
+  <tr><td>item_id</td><td>INTEGER FK &rarr; item</td><td>CASCADE delete</td></tr>
+  <tr><td>stimulus_word_id</td><td>INTEGER FK &rarr; word</td><td>The word played as audio</td></tr>
+  <tr><td>last_reviewed_at</td><td>TEXT</td><td>Last review timestamp</td></tr>
+  <tr><td colspan="3">UNIQUE(item_id, stimulus_word_id) &mdash; one record per direction</td></tr>
+</table>
+<p>Tracks each <strong>direction</strong> independently. For a pair (A, B), "hear A, identify A" and "hear B, identify B" are separate records. Accuracy is computed from <code>trial_log</code>, not stored on this table.</p>
+
+<h3><code>training_state</code></h3>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>id</td><td>INTEGER PK</td><td>Auto-increment</td></tr>
+  <tr><td>pack_id</td><td>INTEGER FK &rarr; pack UNIQUE</td><td>One row per pack</td></tr>
+  <tr><td>phase</td><td>INTEGER DEFAULT 1</td><td>Current training phase (1 or 2)</td></tr>
+  <tr><td>phase_advanced_at</td><td>TEXT</td><td>When last phase change occurred</td></tr>
+  <tr><td>mastered</td><td>INTEGER DEFAULT 0</td><td>1 = pack has reached mastery</td></tr>
+  <tr><td>mastered_at</td><td>TEXT</td><td>When mastery was first achieved</td></tr>
+  <tr><td>session_count_this_week</td><td>INTEGER DEFAULT 0</td><td>Sessions completed this Mon&ndash;Sun week</td></tr>
+  <tr><td>total_seconds_this_week</td><td>INTEGER DEFAULT 0</td><td>Cumulative training seconds this week</td></tr>
+  <tr><td>week_start</td><td>TEXT</td><td>Monday ISO date of current tracking week</td></tr>
+  <tr><td>last_session_date</td><td>TEXT</td><td>Date of most recent session</td></tr>
+  <tr><td>last_session_seconds</td><td>INTEGER DEFAULT 0</td><td>Duration of most recent session</td></tr>
+</table>
+
+<div class="note">
+  <strong>Mastery transitions:</strong> When all items reach 85% over last 20 trials &rarr; <code>mastered = 1</code>, mode switches to review (30 trials/session, once weekly). If pack accuracy drops below 75% during review &rarr; <code>mastered = 0</code>, re-enters active training (100 trials/session).
+</div>
+
+<h3><code>trial_log</code></h3>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>id</td><td>INTEGER PK</td><td>Auto-increment</td></tr>
+  <tr><td>item_id</td><td>INTEGER NOT NULL</td><td>Which item was tested</td></tr>
+  <tr><td>pack_id</td><td>INTEGER NOT NULL</td><td>Which pack</td></tr>
+  <tr><td>stimulus_word_id</td><td>INTEGER NOT NULL</td><td>Word played as audio</td></tr>
+  <tr><td>recording_id</td><td>INTEGER NOT NULL</td><td>Which recording was used</td></tr>
+  <tr><td>response_word_id</td><td>INTEGER NOT NULL</td><td>User's response</td></tr>
+  <tr><td>correct</td><td>INTEGER NOT NULL</td><td>1 = correct, 0 = incorrect</td></tr>
+  <tr><td>response_time_ms</td><td>INTEGER</td><td>Reaction time in milliseconds</td></tr>
+  <tr><td>created_at</td><td>TEXT</td><td>ISO datetime</td></tr>
+</table>
+
+<h3><code>speaker</code></h3>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>id</td><td>INTEGER PK</td><td>Auto-increment</td></tr>
+  <tr><td>name</td><td>TEXT NOT NULL UNIQUE</td><td>Speaker display name</td></tr>
+  <tr><td>created_at</td><td>TEXT</td><td>ISO datetime</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="algorithm">4. Training Algorithm</h2>
+
+<p>The training algorithm is designed specifically for <strong>perceptual learning</strong> (auditory discrimination), not declarative memory. Traditional SRS (spaced repetition) is optimised for fact recall and is a poor fit for minimal pairs training because:</p>
+
+<ul>
+  <li>Perceptual learning benefits from dense initial exposure, not early spacing</li>
+  <li>Binary correct/incorrect on a 50% baseline requires many trials for reliable accuracy estimates</li>
+  <li>Item-level interval scheduling encourages memorising specific recordings rather than learning the phonetic contrast</li>
+</ul>
+
+<p>Instead, the algorithm uses <strong>accuracy-weighted item selection within sessions</strong> and <strong>mastery-gated progression across sessions</strong>.</p>
+
+<h3>Core Principles</h3>
+<ol>
+  <li><strong>No SRS intervals or due dates</strong> &mdash; items do not have scheduled review dates</li>
+  <li><strong>No difficulty adaptation</strong> &mdash; the acoustic difficulty is identical across all items (same phonetic contrast)</li>
+  <li><strong>Accuracy affects item selection within a session</strong> &mdash; weaker items appear more often</li>
+  <li><strong>Mastery is assessed across sessions</strong> &mdash; rolling accuracy over the last 20 trials per item</li>
+  <li><strong>Hard stop per session</strong> &mdash; training ends after a fixed number of trials</li>
+</ol>
+
+<h3>Session Modes</h3>
+<table>
+  <tr><th>Mode</th><th>Trials per session</th><th>Trigger</th></tr>
+  <tr><td><strong>Active training</strong></td><td>100</td><td>Default mode; pack not yet mastered</td></tr>
+  <tr><td><strong>Review</strong></td><td>30</td><td>Pack is mastered; once per week</td></tr>
+</table>
+
+<h3>Mastery</h3>
+
+<div class="algorithm-box">
+  <p><strong>Per-item mastery:</strong> &ge; 85% accuracy (17/20) over the last 20 trials for that item.</p>
+  <p><strong>Pack mastery:</strong> All items in the eligible pool have reached per-item mastery.</p>
+  <p><strong>Mastery loss:</strong> If pack-level accuracy drops below 75% during a review session, the pack re-enters active training (100 trials per session).</p>
+</div>
+
+<p>When a pack reaches mastery:</p>
+<ul>
+  <li>Training mode switches from active (100 trials) to review (30 trials, once weekly)</li>
+  <li>UI shows a mastery celebration</li>
+</ul>
+
+<h3>Pool Expansion (Phases)</h3>
+
+<p>Phases control the <strong>size of the eligible item pool</strong>, not difficulty. Dense initial exposure on a small set builds the perceptual category; the pool then widens.</p>
+
+<h4>Phase 1: Synthetic Pairs Only</h4>
+<ul>
+  <li><strong>Eligible items:</strong> Only items where all words have <code>word_type = 'synthetic'</code></li>
+  <li><strong>Purpose:</strong> Concentrated exposure to the phonetic contrast on a small, controlled set</li>
+  <li><strong>Auto-fallback:</strong> If no synthetic items exist in the pack, automatically advances to Phase 2</li>
+</ul>
+
+<h4>Phase 2: All Pairs</h4>
+<ul>
+  <li><strong>Eligible items:</strong> All items in the pack (synthetic + mixed + real)</li>
+  <li><strong>Purpose:</strong> Broaden exposure to the contrast in varied lexical contexts</li>
+</ul>
+
+<h4>Automatic Phase Advancement</h4>
+<table>
+  <tr><th>Transition</th><th>Criteria</th></tr>
+  <tr><td>Phase 1 &rarr; 2</td><td>All synthetic items have reached per-item mastery (85% over last 20 trials)</td></tr>
+</table>
+<p>When phase advances, the UI shows a celebration modal. Item mastery counters <strong>do not reset</strong> &mdash; synthetic items retain their history.</p>
+
+<h3>Item Selection Within a Session</h3>
+
+<p>Items are selected via <strong>weighted random sampling</strong> based on recent accuracy:</p>
+
+<div class="algorithm-box">
+  <ol>
+    <li>Calculate each item's accuracy over its last 20 trials (or all trials if &lt; 20)</li>
+    <li>Assign a selection weight: <code>weight = 1 - accuracy</code><br>
+      <em>(items at 50% accuracy are weighted 0.5; items at 90% are weighted 0.1)</em></li>
+    <li>Floor weight at 0.05 so mastered items still occasionally appear</li>
+    <li>Select item via weighted random from the eligible pool</li>
+    <li>Within the chosen item, pick a direction (stimulus word) at random</li>
+    <li>Pick a random recording for the stimulus word</li>
+    <li>Shuffle choice buttons (prevents position-learning)</li>
+  </ol>
+</div>
+
+<p><strong>No overtraining cap</strong> &mdash; the weighting naturally spreads exposure. Weak items appear more, but randomness ensures variety.</p>
+
+<h3>Per-Item Accuracy Display</h3>
+<p>Each item's rolling accuracy (last 20 trials) is visible on the browse page as a percentage or visual indicator, giving insight into which pairs are strong/weak.</p>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="session">5. Training Session</h2>
+
+<h3>Session Flow</h3>
+<ol>
+  <li><strong>Load trial</strong> &rarr; API returns item, stimulus word, recording URL, shuffled choices, current phase, trial count</li>
+  <li><strong>Present</strong> &rarr; Audio plays automatically; choices disabled until audio ends</li>
+  <li><strong>Answer</strong> &rarr; User taps a choice button; response submitted to API</li>
+  <li><strong>Feedback</strong> &rarr; Correct/incorrect banner; correct button highlighted green, wrong in red</li>
+  <li><strong>Discrimination</strong> &rarr; Both words shown with play buttons; user can listen to each as many times as desired</li>
+  <li><strong>Next</strong> &rarr; User clicks "Next &rarr;"; if phase advanced, celebration modal appears first</li>
+  <li><strong>Loop</strong> back to step 1 until trial limit reached</li>
+  <li><strong>Session complete</strong> &rarr; "You're done for today" screen</li>
+</ol>
+
+<h3>Session Length</h3>
+<ul>
+  <li><strong>Active training:</strong> 100 trials, hard stop</li>
+  <li><strong>Review mode:</strong> 30 trials, hard stop</li>
+  <li>Trial counter displayed: <code>Trial 42 / 100</code></li>
+  <li>When all trials complete, a completion screen is shown &mdash; no more trials served</li>
+</ul>
+
+<h3>Session Timer</h3>
+<ul>
+  <li>Counts up from 0:00, displayed alongside the trial counter</li>
+  <li>Used for weekly tracking, not as a session limiter</li>
+</ul>
+
+<h3>Session End Tracking</h3>
+<ul>
+  <li>On page unload, <code>navigator.sendBeacon</code> sends elapsed time to <code>/api/end-session</code></li>
+  <li>Sessions &ge; 5 minutes count toward the weekly session goal</li>
+  <li><code>total_seconds_this_week</code> accumulates regardless of session length</li>
+  <li>Session also ends automatically when trial limit is reached</li>
+</ul>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="schedule">6. Weekly Training Schedule</h2>
+
+<p><strong>Active training target:</strong> 2 sessions &times; 100 trials per week<br>
+<strong>Review target:</strong> 1 session &times; 30 trials per week (after mastery)</p>
+
+<h3>Display (End-User Home)</h3>
+<p>Each pack card shows:</p>
+<ul>
+  <li>Phase badge (Phase 1/2 with colour coding: amber/blue; green for mastered)</li>
+  <li>Mode indicator: "Active" or "Review"</li>
+  <li>Session dots: filled = completed session (&ge; 5 min)</li>
+  <li>Text: <code>X / 2 sessions</code> (active) or <code>X / 1 sessions</code> (review)</li>
+</ul>
+
+<h3>Weekly Reset</h3>
+<ul>
+  <li>Tracked via <code>training_state.week_start</code> (Monday ISO date)</li>
+  <li>When the current Monday differs from stored value, counters reset to 0</li>
+</ul>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="content">7. Content Targets: Malayalam &#xd30; vs &#xd31;</h2>
+
+<table>
+  <tr><th>Type</th><th>Count</th><th>Purpose</th></tr>
+  <tr><td>Synthetic</td><td>18 pairs</td><td>Phase 1 &mdash; pure phonetic training</td></tr>
+  <tr><td>Mixed</td><td>12 pairs</td><td>Transition material</td></tr>
+  <tr><td>Real</td><td>30 pairs</td><td>Phase 2 &mdash; real-world application</td></tr>
+  <tr><td><strong>Total</strong></td><td><strong>60 pairs</strong></td><td>~8&ndash;10 weeks of sustained training</td></tr>
+</table>
+
+<p><strong>Rationale:</strong></p>
+<ul>
+  <li>100 trials per active session; 30 per review session</li>
+  <li>18 synthetic pairs &times; 2 directions = 36 directional records &rarr; each seen ~3&times; per Phase 1 session</li>
+  <li>60 total pairs &times; 2 directions = 120 directional records &rarr; sufficient variety to prevent memorisation</li>
+  <li>Accuracy-weighted selection ensures weak pairs get more exposure without excluding strong ones</li>
+</ul>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="json">8. JSON Import Format</h2>
+
+<pre>{
+  "name": "Pack Name",
+  "description": "Optional description",
+  "items": [
+    { "words": ["word1", "word2"], "notes": "real: meaning1 — meaning2" },
+    { "words": ["word1", "word2"], "notes": "synthetic pair" },
+    { "words": ["word1", "word2"], "notes": "mixed: real_meaning — synthetic" }
+  ]
+}</pre>
+
+<p><strong>Word type auto-detection from <code>notes</code> field:</strong></p>
+<ul>
+  <li>Contains <code>"synthetic pair"</code> or starts with <code>"synthetic"</code> &rarr; <code>word_type = 'synthetic'</code></li>
+  <li>Contains <code>"real"</code> &rarr; <code>word_type = 'real'</code></li>
+  <li>Contains <code>"mixed"</code> &rarr; <code>word_type = 'mixed'</code></li>
+  <li>Default (no match) &rarr; <code>word_type = 'real'</code></li>
+</ul>
+<p>All words within an item share the same <code>word_type</code> (determined per-item, not per-word).</p>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="api">9. API Routes</h2>
+
+<h3>Training</h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td>GET</td><td><code>/api/trial/&lt;pack_id&gt;</code></td><td>Get next trial (returns <code>{done: true}</code> if session limit reached)</td></tr>
+  <tr><td>POST</td><td><code>/api/trial</code></td><td>Submit answer; returns correctness, discrimination data, phase info</td></tr>
+  <tr><td>POST</td><td><code>/api/end-session</code></td><td>Record session end (pack_id, elapsed_seconds)</td></tr>
+  <tr><td>GET</td><td><code>/api/training-state/&lt;pack_id&gt;</code></td><td>Get phase, schedule, trial stats</td></tr>
+  <tr><td>POST</td><td><code>/api/reset-progress/&lt;pack_id&gt;</code></td><td>Clear trial logs, training state, and directional records</td></tr>
+</table>
+
+<h3>Content Management</h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td>GET</td><td><code>/api/browse/data</code></td><td>Browse all items/words/recordings</td></tr>
+  <tr><td>POST</td><td><code>/api/word/&lt;id&gt;/rename</code></td><td>Rename a word label</td></tr>
+  <tr><td>POST</td><td><code>/api/word/&lt;id&gt;/type</code></td><td>Change word_type</td></tr>
+  <tr><td>POST</td><td><code>/api/word/&lt;id&gt;/delete</code></td><td>Delete word (auto-deletes item if &lt;2 words remain)</td></tr>
+  <tr><td>POST</td><td><code>/api/recording/&lt;id&gt;/delete</code></td><td>Delete a recording</td></tr>
+  <tr><td>POST</td><td><code>/api/import-recordings</code></td><td>Import recordings from ZIP</td></tr>
+</table>
+
+<h3>Speakers</h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td>GET</td><td><code>/api/speakers</code></td><td>List all speakers</td></tr>
+  <tr><td>POST</td><td><code>/api/speaker/create</code></td><td>Create a speaker</td></tr>
+  <tr><td>POST</td><td><code>/api/speaker/&lt;id&gt;/delete</code></td><td>Delete a speaker</td></tr>
+  <tr><td>GET</td><td><code>/api/session-queue/&lt;pack_id&gt;</code></td><td>Get recording queue for a speaker session</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="pages">10. Pages</h2>
+
+<h3>End User</h3>
+<table>
+  <tr><th>Path</th><th>Description</th></tr>
+  <tr><td><code>/user/</code></td><td>Choose a pack to practise; shows phase, schedule, trial stats</td></tr>
+  <tr><td><code>/user/train/&lt;pack_id&gt;</code></td><td>Training session with accuracy-weighted trials</td></tr>
+</table>
+
+<h3>Superuser</h3>
+<table>
+  <tr><th>Path</th><th>Description</th></tr>
+  <tr><td><code>/superuser/</code></td><td>Pack list; JSON import</td></tr>
+  <tr><td><code>/superuser/pack/&lt;id&gt;</code></td><td>Pack detail; items, recordings, publish, reset progress</td></tr>
+  <tr><td><code>/superuser/pack/&lt;id&gt;/session</code></td><td>In-browser recording session</td></tr>
+  <tr><td><code>/superuser/pack/&lt;id&gt;/export-session</code></td><td>Generate shareable recording link</td></tr>
+  <tr><td><code>/superuser/word/&lt;id&gt;</code></td><td>Manage recordings for a word</td></tr>
+  <tr><td><code>/superuser/browse</code></td><td>Browse mode &mdash; search, rename, re-type, manage</td></tr>
+  <tr><td><code>/superuser/import-recordings</code></td><td>Import recordings ZIP</td></tr>
+</table>
+
+<h3>Recorder</h3>
+<table>
+  <tr><th>Path</th><th>Description</th></tr>
+  <tr><td><code>/recorder</code></td><td>Self-contained recorder page (also deployable to GitHub Pages)</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="recording">11. Recording System</h2>
+
+<h3>In-App Recording</h3>
+<ul>
+  <li>Superuser navigates to pack &rarr; Recording Session</li>
+  <li>Speaker selection (create/switch speakers)</li>
+  <li>Two-tier queue: Tier 1 = words with zero recordings; Tier 2 = words missing this speaker</li>
+  <li>MediaRecorder captures audio; preview before accepting</li>
+</ul>
+
+<h3>Remote Recording</h3>
+<ul>
+  <li>Superuser exports a session link containing a base64-encoded manifest in the URL hash</li>
+  <li>Speaker opens link in any browser, records all words, downloads a ZIP</li>
+  <li>Superuser imports the ZIP via the import-recordings page</li>
+  <li><code>session_id</code> field on recordings prevents duplicate imports</li>
+</ul>
+
+<h3>Recording Selection During Training</h3>
+<ul>
+  <li>When a word has multiple recordings, one is chosen <strong>at random</strong> per trial</li>
+  <li>The algorithm does not track which recording was used &mdash; accuracy is direction-level only</li>
+</ul>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="reset">12. Progress Reset</h2>
+
+<p>Available from the superuser pack detail page:</p>
+<ul>
+  <li>Deletes all <code>directional_record</code> rows for the pack's items</li>
+  <li>Deletes all <code>trial_log</code> rows for the pack</li>
+  <li>Deletes the <code>training_state</code> row (recreated fresh on next access)</li>
+  <li><strong>Does NOT delete recordings or words</strong></li>
+  <li>Resets phase to 1, clears all weekly session counts</li>
+</ul>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="files">13. File Structure</h2>
+
+<pre>minimal_pairs/
+&#x251C;&#x2500;&#x2500; app.py                          # Flask application, all routes
+&#x251C;&#x2500;&#x2500; database.py                     # Schema definition, init_db()
+&#x251C;&#x2500;&#x2500; minimal_pairs.db                # SQLite database (gitignored)
+&#x251C;&#x2500;&#x2500; templates/
+&#x2502;   &#x251C;&#x2500;&#x2500; base.html                   # Base layout
+&#x2502;   &#x251C;&#x2500;&#x2500; index.html                  # Home page
+&#x2502;   &#x251C;&#x2500;&#x2500; user/
+&#x2502;   &#x2502;   &#x251C;&#x2500;&#x2500; index.html              # Pack chooser with schedule display
+&#x2502;   &#x2502;   &#x2514;&#x2500;&#x2500; train.html              # Training session UI
+&#x2502;   &#x2514;&#x2500;&#x2500; superuser/
+&#x2502;       &#x251C;&#x2500;&#x2500; index.html              # Pack list + import
+&#x2502;       &#x251C;&#x2500;&#x2500; pack.html               # Pack detail + reset progress
+&#x2502;       &#x251C;&#x2500;&#x2500; word.html               # Word recordings management
+&#x2502;       &#x251C;&#x2500;&#x2500; session.html            # In-browser recording session
+&#x2502;       &#x251C;&#x2500;&#x2500; browse.html             # Browse mode
+&#x2502;       &#x251C;&#x2500;&#x2500; export_session.html     # Export recording link
+&#x2502;       &#x2514;&#x2500;&#x2500; import_recordings.html  # Import recordings ZIP
+&#x251C;&#x2500;&#x2500; static/
+&#x2502;   &#x251C;&#x2500;&#x2500; css/style.css               # All styles
+&#x2502;   &#x251C;&#x2500;&#x2500; js/
+&#x2502;   &#x2502;   &#x251C;&#x2500;&#x2500; train.js                # Training session controller
+&#x2502;   &#x2502;   &#x251C;&#x2500;&#x2500; browse.js               # Browse mode controller
+&#x2502;   &#x2502;   &#x2514;&#x2500;&#x2500; jszip.min.js            # JSZip library (local copy)
+&#x2502;   &#x251C;&#x2500;&#x2500; audio/                      # Stored recordings (gitignored)
+&#x2502;   &#x251C;&#x2500;&#x2500; recorder/
+&#x2502;   &#x2502;   &#x2514;&#x2500;&#x2500; index.html              # Self-contained remote recorder
+&#x2502;   &#x2514;&#x2500;&#x2500; sample_packs/
+&#x2502;       &#x251C;&#x2500;&#x2500; malayalam_ra_rra.json   # &#xd30; vs &#xd31; pack definition
+&#x2502;       &#x2514;&#x2500;&#x2500; malayalam_na_nna.json   # &#xd28; vs &#xd23; pack definition
+&#x251C;&#x2500;&#x2500; recorder-deploy/
+&#x2502;   &#x2514;&#x2500;&#x2500; index.html                  # Recorder for static hosting
+&#x2514;&#x2500;&#x2500; SPECIFICATION.md                # This document</pre>
+
+<!-- ============================================================ -->
+<hr class="section-divider">
+<h2 id="decisions">14. Design Decisions</h2>
+
+<ol>
+  <li><strong>No user authentication.</strong> Single end-user assumed. Training state is global per pack.</li>
+  <li><strong>No SRS / spaced repetition.</strong> Traditional SRS is designed for declarative memory. Perceptual learning &mdash; training auditory discrimination &mdash; is a different cognitive process. Dense exposure with accuracy-weighted item selection is more appropriate than interval-based scheduling.</li>
+  <li><strong>Accuracy-weighted selection, not difficulty adaptation.</strong> The acoustic difficulty is the same across all items. Rather than adjusting difficulty, the algorithm gives more exposure to weaker items within each session.</li>
+  <li><strong>Hard stop after fixed trial count.</strong> 100 trials for active training, 30 for review. Prevents overtraining and keeps sessions focused.</li>
+  <li><strong>Direction-level tracking, not recording-level.</strong> Prevents gaming by memorising speaker voice rather than phonetic contrast.</li>
+  <li><strong>Random recording selection.</strong> Each trial picks a random recording, building speaker-independent perception. Minimum 5 recordings per word before publishing.</li>
+  <li><strong>Phase = pool expansion, not difficulty.</strong> Phases control how many items are in play. Phase 1 (synthetic only) provides concentrated initial exposure; Phase 2 (all items) broadens the training set.</li>
+  <li><strong>Phase auto-advancement.</strong> No manual intervention needed; user is informed via celebration modal.</li>
+  <li><strong>Offline-first.</strong> JSZip embedded inline in recorder HTML; no CDN dependencies.</li>
+  <li><strong>Notes-based word type detection.</strong> Keeps the JSON import format simple while supporting automatic classification.</li>
+  <li><strong>Discrimination phase after every trial.</strong> Regardless of correctness, the user gets to compare both words, reinforcing the phonetic contrast.</li>
+  <li><strong>Mastery and review cycle.</strong> Pack mastery (all items at 85%+ over 20 trials) triggers a shift to weekly 30-trial review sessions. If accuracy drops below 75%, the pack re-enters active training.</li>
+</ol>
+
+</body>
+</html>

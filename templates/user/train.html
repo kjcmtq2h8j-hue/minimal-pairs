@@ -14,6 +14,19 @@
 {% block content %}
 <div id="train-shell" class="train-shell">
 
+  {# ── Session header: phase + trial counter + timer ── #}
+  <div class="train-session-header">
+    <div id="phase-indicator" class="phase-indicator">
+      <span id="phase-label">{% if mastered %}Mastered{% elif phase == 1 %}Synthetic{% else %}All pairs{% endif %}</span>
+      {% if mastered %}<span class="mode-badge review">Review</span>{% endif %}
+    </div>
+    <div class="session-info">
+      <span id="trial-counter" class="trial-counter">Trial 0 / {{ trial_limit }}</span>
+      <span id="session-score" class="session-score" hidden></span>
+      <span id="session-timer" class="session-timer">0:00</span>
+    </div>
+  </div>
+
   {# ── Loading ── #}
   <div id="phase-loading" class="train-card">
     <p class="loading-msg">Loading…</p>
@@ -33,6 +46,7 @@
     </div>
 
     <div id="feedback-banner" class="feedback-banner" hidden></div>
+    <div id="item-accuracy" class="item-accuracy" hidden></div>
 
   </div>
 
@@ -48,16 +62,34 @@
     <button id="next-btn" class="btn btn-primary btn-lg w-full">Next →</button>
   </div>
 
-  {# ── Done ── #}
+  {# ── Phase advancement celebration ── #}
+  <div id="phase-advance-modal" class="phase-advance-modal" hidden>
+    <div class="phase-advance-card">
+      <div style="font-size:3rem; margin-bottom:.75rem;">🎉</div>
+      <h2 id="advance-title">Great progress!</h2>
+      <p id="advance-message" class="text-muted mt-1 mb-2"></p>
+      <button id="advance-continue-btn" class="btn btn-primary btn-lg">Continue →</button>
+    </div>
+  </div>
+
+  {# ── Mastery celebration ── #}
+  <div id="mastery-modal" class="phase-advance-modal" hidden>
+    <div class="phase-advance-card">
+      <div style="font-size:3rem; margin-bottom:.75rem;">🏆</div>
+      <h2>Pack mastered!</h2>
+      <p class="text-muted mt-1 mb-2">You've reached 85% accuracy on all pairs. Future sessions will be shorter review sessions to maintain your skills.</p>
+      <button id="mastery-continue-btn" class="btn btn-primary btn-lg">Continue →</button>
+    </div>
+  </div>
+
+  {# ── Done (session complete) ── #}
   <div id="phase-done" class="train-card" hidden>
     <div class="done-msg">
-      <div style="font-size:3rem; margin-bottom:.75rem;">🎉</div>
-      <h2>Session complete!</h2>
-      <p class="text-muted mt-1 mb-2">All due items for today have been reviewed.</p>
-      <a href="/user/" class="btn btn-primary">Choose Another Pack</a>
-      <div style="margin-top:.75rem;">
-        <a href="/user/train/{{ pack.id }}" class="btn btn-outline">Continue Practising</a>
-      </div>
+      <div style="font-size:3rem; margin-bottom:.75rem;">✅</div>
+      <h2>You're done for today</h2>
+      <div id="done-summary" class="done-summary" hidden></div>
+      <p class="text-muted mt-1 mb-2">Great work! Come back tomorrow to continue training.</p>
+      <a href="/user/" class="btn btn-primary">Back to Home</a>
     </div>
   </div>
 
@@ -65,6 +97,11 @@
 {% endblock %}
 
 {% block scripts %}
-<script>const PACK_ID = {{ pack.id }};</script>
+<script>
+const PACK_ID = {{ pack.id }};
+const INITIAL_PHASE = {{ phase }};
+const INITIAL_MASTERED = {{ 'true' if mastered else 'false' }};
+const INITIAL_TRIAL_LIMIT = {{ trial_limit }};
+</script>
 <script src="{{ url_for('static', filename='js/train.js') }}"></script>
 {% endblock %}

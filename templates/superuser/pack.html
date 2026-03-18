@@ -21,6 +21,8 @@
   </div>
   <div class="flex-row">
     <a href="/superuser/pack/{{ pack.id }}/session" class="btn btn-primary">🎙 Recording Session</a>
+    <a href="/superuser/pack/{{ pack.id }}/export-session" class="btn btn-outline">📤 Share with Speaker</a>
+    <button class="btn btn-grey btn-sm" onclick="resetProgress()">Reset Progress</button>
     <form method="POST" action="/superuser/pack/{{ pack.id }}/delete"
           onsubmit="return confirm('Delete this pack and all its recordings? This cannot be undone.')">
       <button type="submit" class="btn btn-danger btn-sm">Delete Pack</button>
@@ -93,4 +95,22 @@
     This pack has no items. All items were deleted, or the import was empty.
   </div>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function resetProgress() {
+  if (!confirm('Reset all training progress for this pack? This will clear SRS data, trial history, and phase progress. Recordings will NOT be deleted.')) return;
+  fetch('/api/reset-progress/{{ pack.id }}', { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok) {
+        alert('Progress reset successfully. Phase reset to 1.');
+      } else {
+        alert('Error: ' + (data.error || 'Unknown'));
+      }
+    })
+    .catch(() => alert('Network error.'));
+}
+</script>
 {% endblock %}
