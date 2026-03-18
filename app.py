@@ -1122,12 +1122,14 @@ def su_export_session(pack_id):
     manifest_json = json.dumps(manifest, ensure_ascii=False)
     manifest_b64  = base64.urlsafe_b64encode(manifest_json.encode('utf-8')).decode('ascii')
 
-    local_url = url_for('recorder_page', _external=True) + '#' + manifest_b64
+    local_url  = url_for('recorder_page', _external=True) + '#' + manifest_b64
+    public_url = 'https://kjcmtq2h8j-hue.github.io/minimal-pairs/static/recorder/#' + manifest_b64
 
     return render_template('superuser/export_session.html',
                            pack=pack,
                            manifest_b64=manifest_b64,
                            local_url=local_url,
+                           public_url=public_url,
                            word_count=len(words))
 
 

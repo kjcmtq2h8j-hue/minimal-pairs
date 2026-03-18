@@ -84,56 +84,24 @@
     </div>
   </div>
 
-  <!-- Step 2: Host the recorder (one-time setup) -->
+  <!-- Step 2: Shareable link -->
   <div class="step">
     <div class="step-num">2</div>
     <div class="step-body">
-      <h3>Host the recorder page <span style="font-weight:400;color:var(--text-muted);font-size:.85rem;">(one-time setup)</span></h3>
-      <p>
-        The native speaker's browser needs HTTPS to access the microphone, so the recorder page
-        must be on the internet. Choose a free option below — you only do this once.
-      </p>
-      <div class="hosting-options">
-        <div class="host-card">
-          <h4>Netlify Drop <span style="font-size:.75rem;color:#38a169;">✓ Easiest</span></h4>
-          <p>Drag the <code>recorder/index.html</code> file onto <a href="https://app.netlify.com/drop" target="_blank">app.netlify.com/drop</a>. Get a live HTTPS URL in seconds.</p>
-        </div>
-        <div class="host-card">
-          <h4>GitHub Pages</h4>
-          <p>Create a repo, upload <code>index.html</code> to it, enable Pages in Settings → Pages. Gives a stable URL like <code>yourname.github.io/recorder</code>.</p>
-        </div>
+      <h3>Copy the shareable link</h3>
+      <p>This link works on any device with a browser and microphone (HTTPS, hosted on GitHub Pages).</p>
+      <div class="url-box">
+        <input type="text" id="share-url" readonly
+               value="{{ public_url }}">
+        <button class="btn btn-outline btn-sm" onclick="copyUrl('share-url', this)">Copy</button>
+        <a href="{{ public_url }}" target="_blank" class="btn btn-primary btn-sm">Open ↗</a>
       </div>
-      <p style="margin-top:.65rem; font-size:.85rem;">
-        The file to upload is at:
-        <code style="background:#f0f4ff; padding:.1em .45em; border-radius:4px;">
-          minimal_pairs/static/recorder/index.html
-        </code>
-      </p>
     </div>
   </div>
 
-  <!-- Step 3: Build the shareable link -->
+  <!-- Step 3: Send link -->
   <div class="step">
     <div class="step-num">3</div>
-    <div class="step-body">
-      <h3>Build the shareable link</h3>
-      <p>Paste your hosted URL below — the session data will be appended automatically.</p>
-      <div class="custom-url-row">
-        <input type="text" id="hosted-base"
-               placeholder="https://yourname.netlify.app"
-               oninput="buildShareUrl()">
-        <button class="btn btn-outline btn-sm" onclick="copyUrl('share-url', this)">Copy link</button>
-      </div>
-      <div class="url-box" style="margin-top:.5rem;">
-        <input type="text" id="share-url" readonly
-               placeholder="Shareable link will appear here…">
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 4: Send link -->
-  <div class="step">
-    <div class="step-num">4</div>
     <div class="step-body">
       <h3>Send the link to the speaker</h3>
       <p>
@@ -148,9 +116,9 @@
     </div>
   </div>
 
-  <!-- Step 5: Import -->
+  <!-- Step 4: Import -->
   <div class="step" style="margin-bottom:0;">
-    <div class="step-num">5</div>
+    <div class="step-num">4</div>
     <div class="step-body">
       <h3>Import their recordings</h3>
       <p>Once the speaker sends back the zip file, import it here to attach all recordings to your pack.</p>
