@@ -159,10 +159,9 @@
 
     <div class="download-zone">
       <div class="summary" id="summary-text">0 / 0 words recorded</div>
-      <button class="btn btn-download" id="download-btn" disabled>⬇ Download Recordings</button>
+      <button class="btn btn-download" id="download-btn" disabled>⬆ Upload Recordings</button>
       <p class="hint">
-        Download a zip of your recordings and send it to the researcher.<br>
-        You can re-record any word before downloading.
+        Upload your recordings directly. You can re-record any word before uploading.
       </p>
     </div>
 
@@ -383,46 +382,106 @@ document.getElementById('speaker-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') startSession();
 });
 
-// ─── Download zip ─────────────────────────────────────────────────────────────
+// ─── GitHub upload config ─────────────────────────────────────────────────────
+const GH_TOKEN = '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';
+const GH_REPO  = 'kjcmtq2h8j-hue/minimal-pairs';
+
+async function uploadToGitHub(path, content, message) {
+  const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${GH_TOKEN}`,
+      'Content-Type':  'application/json',
+    },
+    body: JSON.stringify({ message, content }),
+  });
+  if (!resp.ok) {
+    const err = await resp.json();
+    throw new Error(err.message || `GitHub API error ${resp.status}`);
+  }
+  return resp.json();
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+// ─── Upload recordings ───────────────────────────────────────────────────────
 document.getElementById('download-btn').addEventListener('click', async () => {
   const btn = document.getElementById('download-btn');
   btn.disabled    = true;
-  btn.textContent = '⏳ Packaging…';
-  try {
-    const zip = new JSZip();
 
-    // manifest.json (with speaker name + timestamp appended)
+  const safeName = speakerName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  const folder   = `recordings/${manifest.session_id}_${safeName}`;
+  const entries  = Object.entries(recordings);
+  let uploaded = 0;
+
+  btn.textContent = `⬆ Uploading 0 / ${entries.length}…`;
+
+  try {
+    // Upload manifest first
     const exportManifest = Object.assign({}, manifest, {
       speaker_name: speakerName,
       recorded_at:  new Date().toISOString(),
     });
-    zip.file('manifest.json', JSON.stringify(exportManifest, null, 2));
+    const manifestB64 = btoa(unescape(encodeURIComponent(JSON.stringify(exportManifest, null, 2))));
+    await uploadToGitHub(
+      `${folder}/manifest.json`,
+      manifestB64,
+      `Recording session: ${manifest.pack_name} by ${speakerName}`
+    );
 
-    // One audio file per recorded word: word_<id>.<ext>
-    for (const [wordIdStr, blob] of Object.entries(recordings)) {
+    // Upload each recording
+    for (const [wordIdStr, blob] of entries) {
       const ext = blob.type.includes('ogg') ? 'ogg'
                 : blob.type.includes('mp4') ? 'mp4' : 'webm';
-      const buf = await blob.arrayBuffer();
-      zip.file(`word_${wordIdStr}.${ext}`, buf);
+      const b64 = await blobToBase64(blob);
+      await uploadToGitHub(
+        `${folder}/word_${wordIdStr}.${ext}`,
+        b64,
+        `Add recording: word ${wordIdStr}`
+      );
+      uploaded++;
+      btn.textContent = `⬆ Uploading ${uploaded} / ${entries.length}…`;
     }
 
-    const content  = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
-    const safeName = speakerName.replace(/[^a-z0-9]/gi, '_');
-    const url      = URL.createObjectURL(content);
-    const a        = document.createElement('a');
-    a.href     = url;
-    a.download = `recordings_${manifest.session_id}_${safeName}.zip`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    btn.textContent = '✓ Downloaded!';
-    setTimeout(() => { btn.disabled = false; btn.textContent = '⬇ Download Recordings'; }, 3000);
+    btn.textContent = '✓ Uploaded!';
+    btn.className   = 'btn btn-download';
+    setTimeout(() => { btn.disabled = false; btn.textContent = '⬆ Upload Recordings'; }, 3000);
   } catch (e) {
-    alert('Download failed: ' + e.message);
+    alert('Upload failed: ' + e.message + '\n\nFalling back to download…');
+    // Fallback: download as zip
+    try {
+      const zip = new JSZip();
+      const exportManifest2 = Object.assign({}, manifest, {
+        speaker_name: speakerName,
+        recorded_at:  new Date().toISOString(),
+      });
+      zip.file('manifest.json', JSON.stringify(exportManifest2, null, 2));
+      for (const [wordIdStr, blob] of entries) {
+        const ext = blob.type.includes('ogg') ? 'ogg'
+                  : blob.type.includes('mp4') ? 'mp4' : 'webm';
+        zip.file(`word_${wordIdStr}.${ext}`, await blob.arrayBuffer());
+      }
+      const content = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+      const url = URL.createObjectURL(content);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `recordings_${manifest.session_id}_${safeName}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e2) {
+      alert('Download also failed: ' + e2.message);
+    }
     btn.disabled    = false;
-    btn.textContent = '⬇ Download Recordings';
+    btn.textContent = '⬆ Upload Recordings';
   }
 });
 
