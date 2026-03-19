@@ -197,23 +197,38 @@ let audioChunks   = [];
 let currentBlob   = null;
 
 // ─── Boot ────────────────────────────────────────────────────────────────────
-function init() {
+async function init() {
   const hash = location.hash.replace(/^#/, '');
   if (!hash) {
     showError('No session data found in this link. Please use the exact link provided by the researcher.');
     return;
   }
-  try {
-    // base64url → standard base64 → bytes → string (handles Unicode)
-    const b64  = hash.replace(/-/g, '+').replace(/_/g, '/');
-    const json = decodeURIComponent(
-      atob(b64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
-    );
-    manifest = JSON.parse(json);
-  } catch (e) {
-    showError('Could not read session data — the link may be corrupted or truncated. Please ask for a fresh link.');
-    return;
+
+  // Short session ID (e.g. sess_1710..._abc123) → fetch manifest from GitHub
+  if (hash.startsWith('sess_')) {
+    try {
+      const url = `https://raw.githubusercontent.com/${GH_REPO}/main/sessions/${hash}.json`;
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      manifest = await resp.json();
+    } catch (e) {
+      showError('Could not load session data. The session may not exist yet — wait a moment and refresh, or ask the researcher for a new link.');
+      return;
+    }
+  } else {
+    // Legacy: base64-encoded manifest in hash
+    try {
+      const b64  = hash.replace(/-/g, '+').replace(/_/g, '/');
+      const json = decodeURIComponent(
+        atob(b64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+      );
+      manifest = JSON.parse(json);
+    } catch (e) {
+      showError('Could not read session data — the link may be corrupted or truncated. Please ask for a fresh link.');
+      return;
+    }
   }
+
   if (!Array.isArray(manifest.words) || manifest.words.length === 0) {
     showError('This session contains no words. Please ask the researcher to re-export.');
     return;

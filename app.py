@@ -1118,18 +1118,44 @@ def su_export_session(pack_id):
         ],
     }
 
-    # base64url-encode (URL-safe, no padding issues)
-    manifest_json = json.dumps(manifest, ensure_ascii=False)
-    manifest_b64  = base64.urlsafe_b64encode(manifest_json.encode('utf-8')).decode('ascii')
+    # Upload manifest to GitHub so the recorder can fetch it by session ID
+    import urllib.request
+    manifest_json = json.dumps(manifest, ensure_ascii=False, indent=2)
+    manifest_b64  = base64.b64encode(manifest_json.encode('utf-8')).decode('ascii')
 
-    local_url  = url_for('recorder_page', _external=True) + '#' + manifest_b64
-    public_url = 'https://kjcmtq2h8j-hue.github.io/minimal-pairs/static/recorder/#' + manifest_b64
+    gh_token = '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'
+    gh_repo  = 'kjcmtq2h8j-hue/minimal-pairs'
+    gh_path  = f'sessions/{session_id}.json'
+
+    upload_err = None
+    try:
+        req_body = json.dumps({
+            'message': f'Add recording session for {pack["name"]}',
+            'content': manifest_b64,
+        }).encode('utf-8')
+        req = urllib.request.Request(
+            f'https://api.github.com/repos/{gh_repo}/contents/{gh_path}',
+            data=req_body,
+            method='PUT',
+            headers={
+                'Authorization': f'Bearer {gh_token}',
+                'Content-Type': 'application/json',
+                'Accept': 'application/vnd.github+json',
+            },
+        )
+        urllib.request.urlopen(req)
+    except Exception as e:
+        upload_err = str(e)
+
+    public_url = f'https://kjcmtq2h8j-hue.github.io/minimal-pairs/static/recorder/#{session_id}'
+    local_url  = url_for('recorder_page', _external=True) + '#' + session_id
 
     return render_template('superuser/export_session.html',
                            pack=pack,
-                           manifest_b64=manifest_b64,
+                           session_id=session_id,
                            local_url=local_url,
                            public_url=public_url,
+                           upload_err=upload_err,
                            word_count=len(words))
 
 

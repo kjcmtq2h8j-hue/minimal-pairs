@@ -109,10 +109,15 @@
         enters their name, records each word one by one, then downloads a zip file
         of their recordings to send back to you.
       </p>
-      <div class="info-box">
-        📦 The session data ({{ word_count }} words) is embedded in the URL itself —
-        no server or database is involved on the speaker's side.
+      {% if upload_err %}
+      <div class="info-box" style="background:#fff5f5; border-color:#feb2b2; color:#c53030;">
+        ⚠️ Failed to upload session to GitHub: {{ upload_err }}. The link won't work until the session data is uploaded.
       </div>
+      {% else %}
+      <div class="info-box">
+        📦 Session data uploaded to GitHub. The speaker just needs this short link — no software required.
+      </div>
+      {% endif %}
     </div>
   </div>
 
@@ -121,7 +126,7 @@
     <div class="step-num">4</div>
     <div class="step-body">
       <h3>Import their recordings</h3>
-      <p>Once the speaker sends back the zip file, import it here to attach all recordings to your pack.</p>
+      <p>Recordings upload to GitHub automatically. Once done, download the folder from the repo and import here.</p>
       <a href="/superuser/import-recordings" class="btn btn-primary btn-sm" style="margin-top:.6rem; display:inline-flex;">
         ⬆ Go to Import Recordings
       </a>
@@ -131,19 +136,6 @@
 </div>
 
 <script>
-const MANIFEST_B64 = {{ manifest_b64 | tojson }};
-
-function buildShareUrl() {
-  let base = document.getElementById('hosted-base').value.trim().replace(/\/$/, '');
-  if (!base) {
-    document.getElementById('share-url').value = '';
-    return;
-  }
-  // Ensure it has a protocol
-  if (!/^https?:\/\//i.test(base)) base = 'https://' + base;
-  document.getElementById('share-url').value = base + '#' + MANIFEST_B64;
-}
-
 function copyUrl(inputId, btn) {
   const val = document.getElementById(inputId).value;
   if (!val || val.includes('will appear here')) {
