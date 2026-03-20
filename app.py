@@ -1119,31 +1119,35 @@ def su_export_session(pack_id):
     }
 
     # Upload manifest to GitHub so the recorder can fetch it by session ID
-    import urllib.request
+    import subprocess
     manifest_json = json.dumps(manifest, ensure_ascii=False, indent=2)
     manifest_b64  = base64.b64encode(manifest_json.encode('utf-8')).decode('ascii')
 
-    gh_token = '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'
     gh_repo  = 'kjcmtq2h8j-hue/minimal-pairs'
     gh_path  = f'sessions/{session_id}.json'
 
     upload_err = None
     try:
+        # Write manifest to a temp file, commit via gh CLI (avoids SSL issues)
+        import tempfile, os
+        tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
+        tmp.write(manifest_json)
+        tmp.close()
+        # Use gh api to upload
         req_body = json.dumps({
             'message': f'Add recording session for {pack["name"]}',
             'content': manifest_b64,
-        }).encode('utf-8')
-        req = urllib.request.Request(
-            f'https://api.github.com/repos/{gh_repo}/contents/{gh_path}',
-            data=req_body,
-            method='PUT',
-            headers={
-                'Authorization': f'Bearer {gh_token}',
-                'Content-Type': 'application/json',
-                'Accept': 'application/vnd.github+json',
-            },
+        })
+        result = subprocess.run(
+            [os.path.expanduser('~/.local/bin/gh'), 'api',
+             f'repos/{gh_repo}/contents/{gh_path}',
+             '-X', 'PUT',
+             '--input', '-'],
+            input=req_body, capture_output=True, text=True, timeout=30
         )
-        urllib.request.urlopen(req)
+        os.unlink(tmp.name)
+        if result.returncode != 0:
+            raise Exception(result.stderr.strip() or f'gh exited with code {result.returncode}')
     except Exception as e:
         upload_err = str(e)
 
