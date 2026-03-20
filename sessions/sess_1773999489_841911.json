@@ -1,0 +1,248 @@
+{
+  "session_id": "sess_1773999489_841911",
+  "pack_id": 1,
+  "pack_name": "Malayalam ര vs റ Contrasts",
+  "exported_at": "2026-03-20T09:38:09.148474",
+  "words": [
+    {
+      "word_id": 1,
+      "word_label": "കര",
+      "item_id": 1,
+      "item_label": "കര / കറ"
+    },
+    {
+      "word_id": 2,
+      "word_label": "കറ",
+      "item_id": 1,
+      "item_label": "കര / കറ"
+    },
+    {
+      "word_id": 3,
+      "word_label": "കരി",
+      "item_id": 2,
+      "item_label": "കരി / കറി"
+    },
+    {
+      "word_id": 4,
+      "word_label": "കറി",
+      "item_id": 2,
+      "item_label": "കരി / കറി"
+    },
+    {
+      "word_id": 5,
+      "word_label": "മര",
+      "item_id": 3,
+      "item_label": "മര / മറ"
+    },
+    {
+      "word_id": 6,
+      "word_label": "മറ",
+      "item_id": 3,
+      "item_label": "മര / മറ"
+    },
+    {
+      "word_id": 7,
+      "word_label": "തര",
+      "item_id": 4,
+      "item_label": "തര / തറ"
+    },
+    {
+      "word_id": 8,
+      "word_label": "തറ",
+      "item_id": 4,
+      "item_label": "തര / തറ"
+    },
+    {
+      "word_id": 9,
+      "word_label": "പര",
+      "item_id": 5,
+      "item_label": "പര / പറ"
+    },
+    {
+      "word_id": 10,
+      "word_label": "പറ",
+      "item_id": 5,
+      "item_label": "പര / പറ"
+    },
+    {
+      "word_id": 11,
+      "word_label": "ഇര",
+      "item_id": 6,
+      "item_label": "ഇര / ഇറ"
+    },
+    {
+      "word_id": 12,
+      "word_label": "ഇറ",
+      "item_id": 6,
+      "item_label": "ഇര / ഇറ"
+    },
+    {
+      "word_id": 13,
+      "word_label": "ഉര",
+      "item_id": 7,
+      "item_label": "ഉര / ഉറ"
+    },
+    {
+      "word_id": 14,
+      "word_label": "ഉറ",
+      "item_id": 7,
+      "item_label": "ഉര / ഉറ"
+    },
+    {
+      "word_id": 15,
+      "word_label": "വര",
+      "item_id": 8,
+      "item_label": "വര / വറ"
+    },
+    {
+      "word_id": 16,
+      "word_label": "വറ",
+      "item_id": 8,
+      "item_label": "വര / വറ"
+    },
+    {
+      "word_id": 17,
+      "word_label": "അര",
+      "item_id": 9,
+      "item_label": "അര / അറ"
+    },
+    {
+      "word_id": 18,
+      "word_label": "അറ",
+      "item_id": 9,
+      "item_label": "അര / അറ"
+    },
+    {
+      "word_id": 19,
+      "word_label": "കുര",
+      "item_id": 10,
+      "item_label": "കുര / കുറ"
+    },
+    {
+      "word_id": 20,
+      "word_label": "കുറ",
+      "item_id": 10,
+      "item_label": "കുര / കുറ"
+    },
+    {
+      "word_id": 21,
+      "word_label": "പുര",
+      "item_id": 11,
+      "item_label": "പുര / പുറ"
+    },
+    {
+      "word_id": 22,
+      "word_label": "പുറ",
+      "item_id": 11,
+      "item_label": "പുര / പുറ"
+    },
+    {
+      "word_id": 23,
+      "word_label": "അരി",
+      "item_id": 12,
+      "item_label": "അരി / അറി"
+    },
+    {
+      "word_id": 24,
+      "word_label": "അറി",
+      "item_id": 12,
+      "item_label": "അരി / അറി"
+    },
+    {
+      "word_id": 25,
+      "word_label": "കുരു",
+      "item_id": 13,
+      "item_label": "കുരു / കുറു"
+    },
+    {
+      "word_id": 26,
+      "word_label": "കുറു",
+      "item_id": 13,
+      "item_label": "കുരു / കുറു"
+    },
+    {
+      "word_id": 27,
+      "word_label": "തിര",
+      "item_id": 14,
+      "item_label": "തിര / തിറ"
+    },
+    {
+      "word_id": 28,
+      "word_label": "തിറ",
+      "item_id": 14,
+      "item_label": "തിര / തിറ"
+    },
+    {
+      "word_id": 29,
+      "word_label": "നര",
+      "item_id": 15,
+      "item_label": "നര / നറ"
+    },
+    {
+      "word_id": 30,
+      "word_label": "നറ",
+      "item_id": 15,
+      "item_label": "നര / നറ"
+    },
+    {
+      "word_id": 31,
+      "word_label": "ചര",
+      "item_id": 16,
+      "item_label": "ചര / ചറ"
+    },
+    {
+      "word_id": 32,
+      "word_label": "ചറ",
+      "item_id": 16,
+      "item_label": "ചര / ചറ"
+    },
+    {
+      "word_id": 33,
+      "word_label": "ഹര",
+      "item_id": 17,
+      "item_label": "ഹര / ഹറ"
+    },
+    {
+      "word_id": 34,
+      "word_label": "ഹറ",
+      "item_id": 17,
+      "item_label": "ഹര / ഹറ"
+    },
+    {
+      "word_id": 35,
+      "word_label": "മുര",
+      "item_id": 18,
+      "item_label": "മുര / മുറ"
+    },
+    {
+      "word_id": 36,
+      "word_label": "മുറ",
+      "item_id": 18,
+      "item_label": "മുര / മുറ"
+    },
+    {
+      "word_id": 37,
+      "word_label": "ചിര",
+      "item_id": 19,
+      "item_label": "ചിര / ചിറ"
+    },
+    {
+      "word_id": 38,
+      "word_label": "ചിറ",
+      "item_id": 19,
+      "item_label": "ചിര / ചിറ"
+    },
+    {
+      "word_id": 39,
+      "word_label": "ഗര",
+      "item_id": 20,
+      "item_label": "ഗര / ഗറ"
+    },
+    {
+      "word_id": 40,
+      "word_label": "ഗറ",
+      "item_id": 20,
+      "item_label": "ഗര / ഗറ"
+    }
+  ]
+}
