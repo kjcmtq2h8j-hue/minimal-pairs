@@ -1151,7 +1151,7 @@ def su_export_session(pack_id):
     except Exception as e:
         upload_err = str(e)
 
-    public_url = f'https://kjcmtq2h8j-hue.github.io/minimal-pairs/static/recorder/#{session_id}'
+    public_url = f'https://kjcmtq2h8j-hue.github.io/minimal-pairs/#{session_id}'
     local_url  = url_for('recorder_page', _external=True) + '#' + session_id
 
     return render_template('superuser/export_session.html',
