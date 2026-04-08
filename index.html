@@ -397,22 +397,18 @@ document.getElementById('speaker-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') startSession();
 });
 
-// ─── GitHub upload config ─────────────────────────────────────────────────────
-const GH_TOKEN = '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';
-const GH_REPO  = 'kjcmtq2h8j-hue/minimal-pairs';
+// ─── Upload config (via Cloudflare Worker proxy) ─────────────────────────────
+const WORKER_URL = 'https://minimal-pairs-upload.minimal-pairs-recorder.workers.dev';
 
 async function uploadToGitHub(path, content, message) {
-  const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`, {
+  const resp = await fetch(`${WORKER_URL}/upload/${path}`, {
     method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${GH_TOKEN}`,
-      'Content-Type':  'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message, content }),
   });
   if (!resp.ok) {
-    const err = await resp.json();
-    throw new Error(err.message || `GitHub API error ${resp.status}`);
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.message || `Upload error ${resp.status}`);
   }
   return resp.json();
 }

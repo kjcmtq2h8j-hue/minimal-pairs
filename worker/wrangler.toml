@@ -1,0 +1,6 @@
+name = "minimal-pairs-upload"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+GH_REPO = "kjcmtq2h8j-hue/minimal-pairs"
