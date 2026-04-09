@@ -345,9 +345,14 @@ document.getElementById('record-btn').addEventListener('click', async () => {
 
 async function startRecording() {
   try {
-    if (!stream) {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    // Capture the word index at the moment recording starts
+    const recordingIdx = currentIdx;
+    // Always request a fresh stream to avoid stale/ended tracks
+    if (stream) {
+      stream.getTracks().forEach(t => t.stop());
+      stream = null;
     }
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     audioChunks = [];
     const mimeType = ['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg','audio/mp4']
       .find(m => MediaRecorder.isTypeSupported(m)) || '';
@@ -355,9 +360,12 @@ async function startRecording() {
     mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) audioChunks.push(e.data); };
     mediaRecorder.onstop = () => {
       const blob   = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
-      const wordId = manifest.words[currentIdx].word_id;
+      const wordId = manifest.words[recordingIdx].word_id;
       recordings[wordId] = blob;
-      setStateReview(blob);
+      // Only update UI if still on the same word
+      if (currentIdx === recordingIdx) {
+        setStateReview(blob);
+      }
       updateSummary();
     };
     mediaRecorder.start();
