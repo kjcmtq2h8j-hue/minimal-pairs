@@ -398,6 +398,7 @@ document.getElementById('speaker-input').addEventListener('keydown', e => {
 });
 
 // ─── Upload config (via Cloudflare Worker proxy) ─────────────────────────────
+const GH_REPO    = 'kjcmtq2h8j-hue/minimal-pairs';
 const WORKER_URL = 'https://minimal-pairs-upload.minimal-pairs-recorder.workers.dev';
 
 async function uploadToGitHub(path, content, message) {
