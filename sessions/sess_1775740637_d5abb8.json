@@ -1,0 +1,584 @@
+{
+  "session_id": "sess_1775740637_d5abb8",
+  "pack_id": 2,
+  "pack_name": "Malayalam ന vs ണ Contrasts",
+  "exported_at": "2026-04-09T14:17:17.173508",
+  "words": [
+    {
+      "word_id": 41,
+      "word_label": "മണം",
+      "item_id": 21,
+      "item_label": "മണം / മനം"
+    },
+    {
+      "word_id": 42,
+      "word_label": "മനം",
+      "item_id": 21,
+      "item_label": "മണം / മനം"
+    },
+    {
+      "word_id": 43,
+      "word_label": "കണം",
+      "item_id": 22,
+      "item_label": "കണം / കനം"
+    },
+    {
+      "word_id": 44,
+      "word_label": "കനം",
+      "item_id": 22,
+      "item_label": "കണം / കനം"
+    },
+    {
+      "word_id": 45,
+      "word_label": "പണി",
+      "item_id": 23,
+      "item_label": "പണി / പനി"
+    },
+    {
+      "word_id": 46,
+      "word_label": "പനി",
+      "item_id": 23,
+      "item_label": "പണി / പനി"
+    },
+    {
+      "word_id": 47,
+      "word_label": "കണി",
+      "item_id": 24,
+      "item_label": "കണി / കനി"
+    },
+    {
+      "word_id": 48,
+      "word_label": "കനി",
+      "item_id": 24,
+      "item_label": "കണി / കനി"
+    },
+    {
+      "word_id": 49,
+      "word_label": "അണു",
+      "item_id": 25,
+      "item_label": "അണു / അനു"
+    },
+    {
+      "word_id": 50,
+      "word_label": "അനു",
+      "item_id": 25,
+      "item_label": "അണു / അനു"
+    },
+    {
+      "word_id": 51,
+      "word_label": "ഇണ",
+      "item_id": 26,
+      "item_label": "ഇണ / ഇന"
+    },
+    {
+      "word_id": 52,
+      "word_label": "ഇന",
+      "item_id": 26,
+      "item_label": "ഇണ / ഇന"
+    },
+    {
+      "word_id": 53,
+      "word_label": "മണ",
+      "item_id": 27,
+      "item_label": "മണ / മന"
+    },
+    {
+      "word_id": 54,
+      "word_label": "മന",
+      "item_id": 27,
+      "item_label": "മണ / മന"
+    },
+    {
+      "word_id": 55,
+      "word_label": "പണ",
+      "item_id": 28,
+      "item_label": "പണ / പന"
+    },
+    {
+      "word_id": 56,
+      "word_label": "പന",
+      "item_id": 28,
+      "item_label": "പണ / പന"
+    },
+    {
+      "word_id": 57,
+      "word_label": "വിണ",
+      "item_id": 29,
+      "item_label": "വിണ / വിന"
+    },
+    {
+      "word_id": 58,
+      "word_label": "വിന",
+      "item_id": 29,
+      "item_label": "വിണ / വിന"
+    },
+    {
+      "word_id": 59,
+      "word_label": "തണി",
+      "item_id": 30,
+      "item_label": "തണി / തനി"
+    },
+    {
+      "word_id": 60,
+      "word_label": "തനി",
+      "item_id": 30,
+      "item_label": "തണി / തനി"
+    },
+    {
+      "word_id": 61,
+      "word_label": "ഉണ",
+      "item_id": 31,
+      "item_label": "ഉണ / ഉന"
+    },
+    {
+      "word_id": 62,
+      "word_label": "ഉന",
+      "item_id": 31,
+      "item_label": "ഉണ / ഉന"
+    },
+    {
+      "word_id": 63,
+      "word_label": "കണ്ണ്",
+      "item_id": 32,
+      "item_label": "കണ്ണ് / കന്ന്"
+    },
+    {
+      "word_id": 64,
+      "word_label": "കന്ന്",
+      "item_id": 32,
+      "item_label": "കണ്ണ് / കന്ന്"
+    },
+    {
+      "word_id": 65,
+      "word_label": "ആണ",
+      "item_id": 33,
+      "item_label": "ആണ / ആന"
+    },
+    {
+      "word_id": 66,
+      "word_label": "ആന",
+      "item_id": 33,
+      "item_label": "ആണ / ആന"
+    },
+    {
+      "word_id": 67,
+      "word_label": "ഊണ",
+      "item_id": 34,
+      "item_label": "ഊണ / ഊന"
+    },
+    {
+      "word_id": 68,
+      "word_label": "ഊന",
+      "item_id": 34,
+      "item_label": "ഊണ / ഊന"
+    },
+    {
+      "word_id": 69,
+      "word_label": "വാണം",
+      "item_id": 35,
+      "item_label": "വാണം / വാനം"
+    },
+    {
+      "word_id": 70,
+      "word_label": "വാനം",
+      "item_id": 35,
+      "item_label": "വാണം / വാനം"
+    },
+    {
+      "word_id": 71,
+      "word_label": "ബാണം",
+      "item_id": 36,
+      "item_label": "ബാണം / ബാനം"
+    },
+    {
+      "word_id": 72,
+      "word_label": "ബാനം",
+      "item_id": 36,
+      "item_label": "ബാണം / ബാനം"
+    },
+    {
+      "word_id": 73,
+      "word_label": "രണം",
+      "item_id": 37,
+      "item_label": "രണം / രനം"
+    },
+    {
+      "word_id": 74,
+      "word_label": "രനം",
+      "item_id": 37,
+      "item_label": "രണം / രനം"
+    },
+    {
+      "word_id": 75,
+      "word_label": "ഗണം",
+      "item_id": 38,
+      "item_label": "ഗണം / ഗനം"
+    },
+    {
+      "word_id": 76,
+      "word_label": "ഗനം",
+      "item_id": 38,
+      "item_label": "ഗണം / ഗനം"
+    },
+    {
+      "word_id": 77,
+      "word_label": "ഗുണം",
+      "item_id": 39,
+      "item_label": "ഗുണം / ഗുനം"
+    },
+    {
+      "word_id": 78,
+      "word_label": "ഗുനം",
+      "item_id": 39,
+      "item_label": "ഗുണം / ഗുനം"
+    },
+    {
+      "word_id": 79,
+      "word_label": "ക്ഷണം",
+      "item_id": 40,
+      "item_label": "ക്ഷണം / ക്ഷനം"
+    },
+    {
+      "word_id": 80,
+      "word_label": "ക്ഷനം",
+      "item_id": 40,
+      "item_label": "ക്ഷണം / ക്ഷനം"
+    },
+    {
+      "word_id": 81,
+      "word_label": "മണൽ",
+      "item_id": 41,
+      "item_label": "മണൽ / മനൽ"
+    },
+    {
+      "word_id": 82,
+      "word_label": "മനൽ",
+      "item_id": 41,
+      "item_label": "മണൽ / മനൽ"
+    },
+    {
+      "word_id": 83,
+      "word_label": "തണൽ",
+      "item_id": 42,
+      "item_label": "തണൽ / തനൽ"
+    },
+    {
+      "word_id": 84,
+      "word_label": "തനൽ",
+      "item_id": 42,
+      "item_label": "തണൽ / തനൽ"
+    },
+    {
+      "word_id": 85,
+      "word_label": "ചണം",
+      "item_id": 43,
+      "item_label": "ചണം / ചനം"
+    },
+    {
+      "word_id": 86,
+      "word_label": "ചനം",
+      "item_id": 43,
+      "item_label": "ചണം / ചനം"
+    },
+    {
+      "word_id": 87,
+      "word_label": "തോണി",
+      "item_id": 44,
+      "item_label": "തോണി / തോനി"
+    },
+    {
+      "word_id": 88,
+      "word_label": "തോനി",
+      "item_id": 44,
+      "item_label": "തോണി / തോനി"
+    },
+    {
+      "word_id": 89,
+      "word_label": "മണി",
+      "item_id": 45,
+      "item_label": "മണി / മനി"
+    },
+    {
+      "word_id": 90,
+      "word_label": "മനി",
+      "item_id": 45,
+      "item_label": "മണി / മനി"
+    },
+    {
+      "word_id": 91,
+      "word_label": "ഓണം",
+      "item_id": 46,
+      "item_label": "ഓണം / ഓനം"
+    },
+    {
+      "word_id": 92,
+      "word_label": "ഓനം",
+      "item_id": 46,
+      "item_label": "ഓണം / ഓനം"
+    },
+    {
+      "word_id": 93,
+      "word_label": "ധണം",
+      "item_id": 47,
+      "item_label": "ധണം / ധനം"
+    },
+    {
+      "word_id": 94,
+      "word_label": "ധനം",
+      "item_id": 47,
+      "item_label": "ധണം / ധനം"
+    },
+    {
+      "word_id": 95,
+      "word_label": "ജണം",
+      "item_id": 48,
+      "item_label": "ജണം / ജനം"
+    },
+    {
+      "word_id": 96,
+      "word_label": "ജനം",
+      "item_id": 48,
+      "item_label": "ജണം / ജനം"
+    },
+    {
+      "word_id": 97,
+      "word_label": "വണം",
+      "item_id": 49,
+      "item_label": "വണം / വനം"
+    },
+    {
+      "word_id": 98,
+      "word_label": "വനം",
+      "item_id": 49,
+      "item_label": "വണം / വനം"
+    },
+    {
+      "word_id": 99,
+      "word_label": "കാണം",
+      "item_id": 50,
+      "item_label": "കാണം / കാനം"
+    },
+    {
+      "word_id": 100,
+      "word_label": "കാനം",
+      "item_id": 50,
+      "item_label": "കാണം / കാനം"
+    },
+    {
+      "word_id": 101,
+      "word_label": "കുണ",
+      "item_id": 51,
+      "item_label": "കുണ / കുന"
+    },
+    {
+      "word_id": 102,
+      "word_label": "കുന",
+      "item_id": 51,
+      "item_label": "കുണ / കുന"
+    },
+    {
+      "word_id": 103,
+      "word_label": "തുണി",
+      "item_id": 52,
+      "item_label": "തുണി / തുനി"
+    },
+    {
+      "word_id": 104,
+      "word_label": "തുനി",
+      "item_id": 52,
+      "item_label": "തുണി / തുനി"
+    },
+    {
+      "word_id": 105,
+      "word_label": "പുണ",
+      "item_id": 53,
+      "item_label": "പുണ / പുന"
+    },
+    {
+      "word_id": 106,
+      "word_label": "പുന",
+      "item_id": 53,
+      "item_label": "പുണ / പുന"
+    },
+    {
+      "word_id": 107,
+      "word_label": "വണി",
+      "item_id": 54,
+      "item_label": "വണി / വനി"
+    },
+    {
+      "word_id": 108,
+      "word_label": "വനി",
+      "item_id": 54,
+      "item_label": "വണി / വനി"
+    },
+    {
+      "word_id": 109,
+      "word_label": "ചിണ",
+      "item_id": 55,
+      "item_label": "ചിണ / ചിന"
+    },
+    {
+      "word_id": 110,
+      "word_label": "ചിന",
+      "item_id": 55,
+      "item_label": "ചിണ / ചിന"
+    },
+    {
+      "word_id": 111,
+      "word_label": "തണം",
+      "item_id": 56,
+      "item_label": "തണം / തനം"
+    },
+    {
+      "word_id": 112,
+      "word_label": "തനം",
+      "item_id": 56,
+      "item_label": "തണം / തനം"
+    },
+    {
+      "word_id": 113,
+      "word_label": "ചുണു",
+      "item_id": 57,
+      "item_label": "ചുണു / ചുനു"
+    },
+    {
+      "word_id": 114,
+      "word_label": "ചുനു",
+      "item_id": 57,
+      "item_label": "ചുണു / ചുനു"
+    },
+    {
+      "word_id": 115,
+      "word_label": "പെണു",
+      "item_id": 58,
+      "item_label": "പെണു / പെനു"
+    },
+    {
+      "word_id": 116,
+      "word_label": "പെനു",
+      "item_id": 58,
+      "item_label": "പെണു / പെനു"
+    },
+    {
+      "word_id": 117,
+      "word_label": "കണിമ",
+      "item_id": 59,
+      "item_label": "കണിമ / കനിമ"
+    },
+    {
+      "word_id": 118,
+      "word_label": "കനിമ",
+      "item_id": 59,
+      "item_label": "കണിമ / കനിമ"
+    },
+    {
+      "word_id": 119,
+      "word_label": "തുണല",
+      "item_id": 60,
+      "item_label": "തുണല / തുനല"
+    },
+    {
+      "word_id": 120,
+      "word_label": "തുനല",
+      "item_id": 60,
+      "item_label": "തുണല / തുനല"
+    },
+    {
+      "word_id": 121,
+      "word_label": "വിണുക",
+      "item_id": 61,
+      "item_label": "വിണുക / വിനുക"
+    },
+    {
+      "word_id": 122,
+      "word_label": "വിനുക",
+      "item_id": 61,
+      "item_label": "വിണുക / വിനുക"
+    },
+    {
+      "word_id": 123,
+      "word_label": "പോണ",
+      "item_id": 62,
+      "item_label": "പോണ / പോന"
+    },
+    {
+      "word_id": 124,
+      "word_label": "പോന",
+      "item_id": 62,
+      "item_label": "പോണ / പോന"
+    },
+    {
+      "word_id": 125,
+      "word_label": "മാണു",
+      "item_id": 63,
+      "item_label": "മാണു / മാനു"
+    },
+    {
+      "word_id": 126,
+      "word_label": "മാനു",
+      "item_id": 63,
+      "item_label": "മാണു / മാനു"
+    },
+    {
+      "word_id": 127,
+      "word_label": "കൂണി",
+      "item_id": 64,
+      "item_label": "കൂണി / കൂനി"
+    },
+    {
+      "word_id": 128,
+      "word_label": "കൂനി",
+      "item_id": 64,
+      "item_label": "കൂണി / കൂനി"
+    },
+    {
+      "word_id": 129,
+      "word_label": "തീണു",
+      "item_id": 65,
+      "item_label": "തീണു / തീനു"
+    },
+    {
+      "word_id": 130,
+      "word_label": "തീനു",
+      "item_id": 65,
+      "item_label": "തീണു / തീനു"
+    },
+    {
+      "word_id": 131,
+      "word_label": "വോണ",
+      "item_id": 66,
+      "item_label": "വോണ / വോന"
+    },
+    {
+      "word_id": 132,
+      "word_label": "വോന",
+      "item_id": 66,
+      "item_label": "വോണ / വോന"
+    },
+    {
+      "word_id": 133,
+      "word_label": "ചിണല",
+      "item_id": 67,
+      "item_label": "ചിണല / ചിനല"
+    },
+    {
+      "word_id": 134,
+      "word_label": "ചിനല",
+      "item_id": 67,
+      "item_label": "ചിണല / ചിനല"
+    },
+    {
+      "word_id": 135,
+      "word_label": "പൂണം",
+      "item_id": 68,
+      "item_label": "പൂണം / പൂനം"
+    },
+    {
+      "word_id": 136,
+      "word_label": "പൂനം",
+      "item_id": 68,
+      "item_label": "പൂണം / പൂനം"
+    }
+  ]
+}
