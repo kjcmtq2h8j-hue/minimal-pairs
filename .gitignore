@@ -1,8 +1,11 @@
-# Database
-*.db
+# Local database (has training progress — don't share)
+minimal_pairs.db
 
-# Audio recordings
-static/audio/
+# Build artifacts
+build_minimal_pairs.db
+dist/
+build/
+*.spec
 
 # Python
 __pycache__/
@@ -12,4 +15,3 @@ __pycache__/
 
 # OS
 .DS_Store
-build_minimal_pairs.db
