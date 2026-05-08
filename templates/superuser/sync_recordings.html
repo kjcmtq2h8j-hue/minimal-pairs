@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Sync Recordings from GitHub{% endblock %}
+
+{% block head %}
+<style>
+  .sync-card { max-width: 700px; }
+  .session-list { list-style: none; padding: 0; margin: 1.5rem 0; }
+  .session-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.75rem 1rem; border: 1px solid var(--grey-light, #e2e8f0);
+    border-radius: 8px; margin-bottom: 0.5rem;
+    background: var(--surface, #fff);
+  }
+  .session-item .name { font-weight: 600; font-size: 0.95rem; }
+  .session-item .status { font-size: 0.85rem; color: var(--text-muted, #718096); }
+  .session-item .imported { color: var(--green, #38a169); }
+  .btn-import {
+    padding: 0.4rem 1rem; font-size: 0.85rem; border-radius: 6px;
+    border: none; cursor: pointer; font-weight: 600;
+    background: var(--primary, #4a6cf7); color: #fff;
+  }
+  .btn-import:disabled { opacity: 0.5; cursor: default; }
+  .btn-import.done { background: var(--green, #38a169); }
+  .result-msg { font-size: 0.85rem; margin-top: 0.25rem; }
+  .result-msg.error { color: var(--red, #e53e3e); }
+  .result-msg.success { color: var(--green, #38a169); }
+  .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted, #718096); }
+</style>
+{% endblock %}
+
+{% block nav %}
+<nav class="breadcrumb">
+  <a href="/superuser/">Superuser</a>
+  <span class="sep"></span>
+  Sync Recordings
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="sync-card card">
+  <h2>Sync Recordings from GitHub</h2>
+  <p class="text-muted">Recording sessions uploaded by speakers appear here. Click Import to download and add them to your training library.</p>
+
+  {% if sessions %}
+  <ul class="session-list">
+    {% for s in sessions %}
+    <li class="session-item" data-folder="{{ s.name }}">
+      <div>
+        <div class="name">{{ s.name }}</div>
+        <div class="status">
+          {% if s.name in imported_sessions %}
+            <span class="imported">✓ Already imported</span>
+          {% else %}
+            Ready to import
+          {% endif %}
+        </div>
+        <div class="result-msg" hidden></div>
+      </div>
+      <button class="btn-import"
+              {% if s.name in imported_sessions %}disabled{% endif %}
+              onclick="importSession(this, '{{ s.name }}')">
+        {% if s.name in imported_sessions %}Imported{% else %}Import{% endif %}
+      </button>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="empty-state">
+    <p>No recording sessions found on GitHub yet.</p>
+    <p>Once a speaker uploads recordings, they'll appear here.</p>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+async function importSession(btn, folder) {
+  btn.disabled = true;
+  btn.textContent = 'Importing…';
+  const item = btn.closest('.session-item');
+  const msgEl = item.querySelector('.result-msg');
+
+  try {
+    const resp = await fetch('/api/sync-recordings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ folder }),
+    });
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      msgEl.textContent = data.error || 'Import failed';
+      msgEl.className = 'result-msg error';
+      msgEl.hidden = false;
+      btn.textContent = 'Retry';
+      btn.disabled = false;
+      return;
+    }
+
+    btn.textContent = 'Imported';
+    btn.classList.add('done');
+    item.querySelector('.status').innerHTML = '<span class="imported">✓ Imported</span>';
+    msgEl.textContent = `${data.imported} recordings from ${data.speaker}`;
+    if (data.errors.length) msgEl.textContent += ` (${data.errors.length} skipped)`;
+    msgEl.className = 'result-msg success';
+    msgEl.hidden = false;
+  } catch (e) {
+    msgEl.textContent = 'Network error: ' + e.message;
+    msgEl.className = 'result-msg error';
+    msgEl.hidden = false;
+    btn.textContent = 'Retry';
+    btn.disabled = false;
+  }
+}
+</script>
+{% endblock %}

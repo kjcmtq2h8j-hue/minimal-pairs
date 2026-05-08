@@ -34,7 +34,10 @@ def setup_data():
     audio_dest = os.path.join(data_dir, 'audio')
 
     # Copy database if not present (first run)
-    bundled_db = os.path.join(bundle_dir, 'minimal_pairs.db')
+    # Build script creates build_minimal_pairs.db; fall back to minimal_pairs.db
+    bundled_db = os.path.join(bundle_dir, 'build_minimal_pairs.db')
+    if not os.path.exists(bundled_db):
+        bundled_db = os.path.join(bundle_dir, 'minimal_pairs.db')
     if not os.path.exists(db_dest) and os.path.exists(bundled_db):
         shutil.copy2(bundled_db, db_dest)
 

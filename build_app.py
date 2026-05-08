@@ -23,6 +23,42 @@ def main():
         print('Installing PyInstaller...')
         subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyinstaller'])
 
+    # Create a clean copy of the database for bundling:
+    # - Remove packs with no recordings
+    # - Clear training history (trial_log, training_state, directional_record)
+    import shutil
+    import sqlite3
+    build_db = os.path.join(project_dir, 'build_minimal_pairs.db')
+    if os.path.exists(os.path.join(project_dir, 'minimal_pairs.db')):
+        shutil.copy2(os.path.join(project_dir, 'minimal_pairs.db'), build_db)
+        db = sqlite3.connect(build_db)
+        # Find packs with no recordings
+        empty_packs = db.execute('''
+            SELECT p.id FROM pack p
+            WHERE NOT EXISTS (
+                SELECT 1 FROM recording r
+                JOIN word w ON w.id = r.word_id
+                JOIN item i ON i.id = w.item_id
+                WHERE i.pack_id = p.id
+            )
+        ''').fetchall()
+        for row in empty_packs:
+            pid = row[0]
+            print(f'  Excluding pack {pid} (no recordings)')
+            db.execute('DELETE FROM word WHERE item_id IN (SELECT id FROM item WHERE pack_id = ?)', (pid,))
+            db.execute('DELETE FROM item WHERE pack_id = ?', (pid,))
+            db.execute('DELETE FROM pack WHERE id = ?', (pid,))
+        # Clear user training history
+        db.execute('DELETE FROM trial_log')
+        db.execute('DELETE FROM training_state')
+        db.execute('DELETE FROM directional_record')
+        db.commit()
+        remaining = db.execute('SELECT COUNT(*) FROM pack').fetchone()[0]
+        print(f'  Bundling {remaining} pack(s) with recordings')
+        db.close()
+    else:
+        print('WARNING: minimal_pairs.db not found.')
+
     # Collect data files
     datas = [
         ('templates', 'templates'),
@@ -35,11 +71,11 @@ def main():
     if os.path.exists(audio_dir) and os.listdir(audio_dir):
         datas.append(('static/audio', 'static/audio'))
 
-    # Add database
-    if os.path.exists('minimal_pairs.db'):
-        datas.append(('minimal_pairs.db', '.'))
+    # Add the clean database copy
+    if os.path.exists(build_db):
+        datas.append(('build_minimal_pairs.db', '.'))
     else:
-        print('WARNING: minimal_pairs.db not found. The app will start with an empty database.')
+        print('WARNING: No database to bundle. The app will start empty.')
 
     # Add database.py and app.py as data (imported at runtime by launcher)
     datas.append(('app.py', '.'))
