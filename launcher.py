@@ -4,6 +4,7 @@ Opens the training app in the default browser. No superuser features.
 """
 import os
 import sys
+import socket
 import shutil
 import webbrowser
 import threading
@@ -25,6 +26,12 @@ def get_bundle_dir():
         return sys._MEIPASS
     return os.path.dirname(os.path.abspath(__file__))
 
+def find_free_port():
+    """Find a free port to avoid conflicts with other services."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('127.0.0.1', 0))
+        return s.getsockname()[1]
+
 def setup_data():
     """Copy bundled DB and audio to writable data dir on first run."""
     data_dir = get_data_dir()
@@ -34,11 +41,15 @@ def setup_data():
     audio_dest = os.path.join(data_dir, 'audio')
 
     # Copy database if not present (first run)
-    # Build script creates build_minimal_pairs.db; fall back to minimal_pairs.db
-    bundled_db = os.path.join(bundle_dir, 'build_minimal_pairs.db')
-    if not os.path.exists(bundled_db):
-        bundled_db = os.path.join(bundle_dir, 'minimal_pairs.db')
-    if not os.path.exists(db_dest) and os.path.exists(bundled_db):
+    # Build script creates build_minimal_pairs.db; fall back to clean.db or minimal_pairs.db
+    for db_name in ['build_minimal_pairs.db', 'clean.db', 'minimal_pairs.db']:
+        bundled_db = os.path.join(bundle_dir, db_name)
+        if os.path.exists(bundled_db):
+            break
+    else:
+        bundled_db = None
+
+    if not os.path.exists(db_dest) and bundled_db:
         shutil.copy2(bundled_db, db_dest)
 
     # Copy audio files if not present
@@ -54,10 +65,12 @@ def setup_data():
 
 def main():
     data_dir = setup_data()
+    port = find_free_port()
 
     # Set environment so the app uses the writable data dir
     os.environ['MINIMAL_PAIRS_DATA_DIR'] = data_dir
     os.environ['MINIMAL_PAIRS_STANDALONE'] = '1'
+    os.environ['MINIMAL_PAIRS_DB'] = os.path.join(data_dir, 'minimal_pairs.db')
 
     # Import app after setting env
     bundle_dir = get_bundle_dir()
@@ -65,24 +78,30 @@ def main():
 
     from app import app, init_db
 
-    # Point database and audio to writable location
-    app.config['DATABASE'] = os.path.join(data_dir, 'minimal_pairs.db')
-
     init_db()
 
     # Open browser after short delay
+    url = f'http://localhost:{port}/user/'
     def open_browser():
         import time
         time.sleep(1.5)
-        webbrowser.open('http://localhost:5001/user/')
+        webbrowser.open(url)
 
     threading.Thread(target=open_browser, daemon=True).start()
 
-    print(f'Minimal Pairs Training running at http://localhost:5001/user/')
+    # Also try opening immediately via subprocess for macOS .app bundles
+    if sys.platform == 'darwin':
+        def open_browser_fallback():
+            import time, subprocess
+            time.sleep(2.5)
+            subprocess.run(['open', url], capture_output=True)
+        threading.Thread(target=open_browser_fallback, daemon=True).start()
+
+    print(f'Minimal Pairs Training running at {url}')
     print(f'Data stored in: {data_dir}')
     print('Close this window to stop.')
 
-    app.run(host='127.0.0.1', port=5001, debug=False)
+    app.run(host='127.0.0.1', port=port, debug=False)
 
 if __name__ == '__main__':
     main()

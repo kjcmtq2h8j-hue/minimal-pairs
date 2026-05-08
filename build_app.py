@@ -97,7 +97,7 @@ def main():
     cmd = [
         sys.executable, '-m', 'PyInstaller',
         '--onefile',
-        '--windowed' if sys.platform == 'darwin' else '--console',
+        '--console',
         '--name', name,
         *add_data_args,
         '--hidden-import', 'flask',
