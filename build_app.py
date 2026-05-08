@@ -29,8 +29,12 @@ def main():
     import shutil
     import sqlite3
     build_db = os.path.join(project_dir, 'build_minimal_pairs.db')
-    if os.path.exists(os.path.join(project_dir, 'minimal_pairs.db')):
-        shutil.copy2(os.path.join(project_dir, 'minimal_pairs.db'), build_db)
+    # Prefer clean.db (repo version), fall back to local minimal_pairs.db
+    source_db = os.path.join(project_dir, 'clean.db')
+    if not os.path.exists(source_db):
+        source_db = os.path.join(project_dir, 'minimal_pairs.db')
+    if os.path.exists(source_db):
+        shutil.copy2(source_db, build_db)
         db = sqlite3.connect(build_db)
         # Find packs with no recordings
         empty_packs = db.execute('''
