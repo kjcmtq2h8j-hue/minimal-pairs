@@ -1,6 +1,7 @@
+import os
 import sqlite3
 
-DB_PATH = 'minimal_pairs.db'
+DB_PATH = os.environ.get('MINIMAL_PAIRS_DB', 'minimal_pairs.db')
 
 
 def get_db():

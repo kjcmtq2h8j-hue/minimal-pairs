@@ -15,7 +15,21 @@ from database import get_db, init_db
 app = Flask(__name__)
 app.secret_key = 'minimal-pairs-local-secret-2024'
 
-AUDIO_DIR = os.path.join(app.static_folder, 'audio')
+STANDALONE = os.environ.get('MINIMAL_PAIRS_STANDALONE') == '1'
+DATA_DIR = os.environ.get('MINIMAL_PAIRS_DATA_DIR', '')
+
+if DATA_DIR:
+    AUDIO_DIR = os.path.join(DATA_DIR, 'audio')
+    # Set DB path for database.py
+    os.environ['MINIMAL_PAIRS_DB'] = os.path.join(DATA_DIR, 'minimal_pairs.db')
+    # Serve audio from the data dir
+    import flask
+    @app.route('/data/audio/<path:filename>')
+    def serve_data_audio(filename):
+        return send_from_directory(AUDIO_DIR, filename)
+else:
+    AUDIO_DIR = os.path.join(app.static_folder, 'audio')
+
 os.makedirs(AUDIO_DIR, exist_ok=True)
 
 # ── Training algorithm constants ──────────────────────────────────────────────
@@ -44,15 +58,13 @@ def ensure_directional_records(db, pack_id):
 def get_eligible_item_ids(db, pack_id, phase):
     """Get item IDs eligible for training based on current phase."""
     if phase == 1:
-        # Phase 1: only items where ALL words are synthetic
+        # Phase 1: items where ANY word is synthetic or mixed (not purely real pairs)
         item_ids = [r['id'] for r in db.execute('''
             SELECT i.id FROM item i
             WHERE i.pack_id = ?
-              AND NOT EXISTS (
-                  SELECT 1 FROM word w WHERE w.item_id = i.id AND w.word_type != 'synthetic'
-              )
               AND EXISTS (
                   SELECT 1 FROM word w WHERE w.item_id = i.id
+                    AND w.word_type IN ('synthetic', 'mixed')
               )
         ''', (pack_id,)).fetchall()]
     else:
@@ -191,12 +203,31 @@ def get_next_trial(db, pack_id):
     if not words:
         return None
 
+    word_ids = [w['id'] for w in words]
+
+    # Find speakers who have recordings for ALL words in this pair
+    eligible_speakers = db.execute('''
+        SELECT speaker_label FROM recording
+        WHERE word_id IN ({})
+        GROUP BY speaker_label
+        HAVING COUNT(DISTINCT word_id) = ?
+    '''.format(','.join('?' * len(word_ids))),
+        word_ids + [len(word_ids)]
+    ).fetchall()
+
+    if not eligible_speakers:
+        return None  # no speaker covers all words in this pair
+
+    speaker = random.choice(eligible_speakers)['speaker_label']
+
+    # Pick a random direction
     stimulus_word = random.choice(words)
     stimulus_word_id = stimulus_word['id']
 
-    # Pick a random recording for the stimulus word
+    # Pick a random recording from the chosen speaker
     recordings = db.execute(
-        'SELECT * FROM recording WHERE word_id = ?', (stimulus_word_id,)
+        'SELECT * FROM recording WHERE word_id = ? AND speaker_label = ?',
+        (stimulus_word_id, speaker)
     ).fetchall()
     if not recordings:
         return None
@@ -937,16 +968,29 @@ def api_submit_trial():
 
     trial_limit = REVIEW_TRIAL_LIMIT if (was_mastered or pack_mastered) else ACTIVE_TRIAL_LIMIT
 
-    # Discrimination phase data: one random recording per word
+    # Discrimination phase data: use same speaker as stimulus for consistency
+    stimulus_rec = db.execute(
+        'SELECT speaker_label FROM recording WHERE id = ?', (recording_id,)
+    ).fetchone()
+    stimulus_speaker = stimulus_rec['speaker_label'] if stimulus_rec else None
+
     words = db.execute(
         'SELECT id, label FROM word WHERE item_id = ? ORDER BY id', (item_id,)
     ).fetchall()
     discrimination = []
     for w in words:
-        rec = db.execute(
-            'SELECT * FROM recording WHERE word_id = ? ORDER BY RANDOM() LIMIT 1',
-            (w['id'],)
-        ).fetchone()
+        # Try same speaker first, fall back to any recording
+        rec = None
+        if stimulus_speaker:
+            rec = db.execute(
+                'SELECT * FROM recording WHERE word_id = ? AND speaker_label = ? ORDER BY RANDOM() LIMIT 1',
+                (w['id'], stimulus_speaker)
+            ).fetchone()
+        if not rec:
+            rec = db.execute(
+                'SELECT * FROM recording WHERE word_id = ? ORDER BY RANDOM() LIMIT 1',
+                (w['id'],)
+            ).fetchone()
         rec_url = None
         if rec:
             fname = os.path.basename(rec['file_path'])
@@ -1265,6 +1309,182 @@ def api_import_recordings():
         'skipped':  skipped,
         'errors':   errors,
         'speaker':  speaker_name,
+    })
+
+
+# ── GitHub recording auto-import ─────────────────────────────────────────────
+
+GH_REPO = 'kjcmtq2h8j-hue/minimal-pairs'
+GH_RAW  = f'https://raw.githubusercontent.com/{GH_REPO}/main'
+GH_API  = f'https://api.github.com/repos/{GH_REPO}/contents'
+
+import urllib.request, urllib.error, ssl
+
+# macOS Python often lacks certs; create a permissive context for GitHub only
+_gh_ssl_ctx = ssl.create_default_context()
+_gh_ssl_ctx.check_hostname = False
+_gh_ssl_ctx.verify_mode = ssl.CERT_NONE
+
+def gh_fetch_json(url):
+    """Fetch JSON from GitHub API (unauthenticated — fine for public repos)."""
+    req = urllib.request.Request(url, headers={'User-Agent': 'minimal-pairs-app'})
+    with urllib.request.urlopen(req, timeout=15, context=_gh_ssl_ctx) as resp:
+        return json.loads(resp.read())
+
+def gh_download(url):
+    """Download raw bytes from a URL."""
+    req = urllib.request.Request(url, headers={'User-Agent': 'minimal-pairs-app'})
+    with urllib.request.urlopen(req, timeout=30, context=_gh_ssl_ctx) as resp:
+        return resp.read()
+
+
+@app.route('/superuser/sync-recordings')
+def su_sync_recordings_page():
+    """Page showing available GitHub recording sessions to import."""
+    # List session folders in recordings/
+    try:
+        entries = gh_fetch_json(f'{GH_API}/recordings')
+    except urllib.error.HTTPError:
+        entries = []
+
+    # Filter to directories (session folders)
+    sessions = [e for e in entries if e['type'] == 'dir']
+
+    # Check which have already been imported (by session_id + speaker)
+    db = get_db()
+    imported_sessions = set()
+    for s in sessions:
+        folder_name = s['name']
+        # Folder format: sess_XXXXX_YYYYYY_speakername
+        parts = folder_name.split('_')
+        if len(parts) >= 4:
+            session_id = '_'.join(parts[:3])  # sess_XXXXX_YYYYYY
+            speaker = '_'.join(parts[3:])     # speaker name portion
+        elif len(parts) >= 3:
+            session_id = '_'.join(parts[:3])
+            speaker = None
+        else:
+            session_id = folder_name
+            speaker = None
+
+        if speaker:
+            count = db.execute(
+                'SELECT COUNT(*) FROM recording WHERE session_id = ? AND speaker_label = ?',
+                (session_id, speaker)
+            ).fetchone()[0]
+        else:
+            count = db.execute(
+                'SELECT COUNT(*) FROM recording WHERE session_id = ?', (session_id,)
+            ).fetchone()[0]
+        if count > 0:
+            imported_sessions.add(folder_name)
+    db.close()
+
+    return render_template('superuser/sync_recordings.html',
+                           sessions=sessions,
+                           imported_sessions=imported_sessions)
+
+
+@app.route('/api/sync-recordings', methods=['POST'])
+def api_sync_recordings():
+    """Import a recording session from the GitHub repo recordings/ folder."""
+    data = request.get_json() or {}
+    folder = data.get('folder', '').strip()
+    if not folder:
+        return jsonify({'error': 'No folder specified'}), 400
+
+    # Fetch manifest from the folder
+    try:
+        manifest = gh_fetch_json(f'{GH_RAW}/recordings/{folder}/manifest.json')
+    except Exception as e:
+        return jsonify({'error': f'Could not fetch manifest: {e}'}), 400
+
+    words_by_id = {w['word_id']: w for w in manifest.get('words', [])}
+    speaker_name = manifest.get('speaker_name', 'Unknown')
+    session_id   = manifest.get('session_id', '')
+
+    db = get_db()
+
+    # Guard: block re-import (check session_id + speaker combo, not just session_id)
+    if session_id and speaker_name:
+        already = db.execute(
+            'SELECT COUNT(*) FROM recording WHERE session_id = ? AND speaker_label = ?',
+            (session_id, speaker_name)
+        ).fetchone()[0]
+        if already:
+            db.close()
+            return jsonify({
+                'error': f'Session already imported for {speaker_name} ({already} recordings on file).'
+            }), 409
+
+    # List files in the folder
+    try:
+        files = gh_fetch_json(f'{GH_API}/recordings/{folder}')
+    except Exception as e:
+        db.close()
+        return jsonify({'error': f'Could not list folder: {e}'}), 400
+
+    imported, skipped, errors = 0, 0, []
+
+    for f_entry in files:
+        name = f_entry['name']
+        if name == 'manifest.json':
+            continue
+
+        stem, _, ext = name.rpartition('.')
+        ext = ext.lower()
+        if ext not in ('webm', 'ogg', 'mp4', 'm4a', 'wav'):
+            continue
+
+        # Parse word ID from filename: word_<id>.<ext>
+        try:
+            parts = stem.split('_')
+            word_id = int(parts[1])
+        except (IndexError, ValueError):
+            errors.append(f'Skipped "{name}" — could not parse word ID')
+            continue
+
+        if word_id not in words_by_id:
+            errors.append(f'Skipped "{name}" — word ID {word_id} not in manifest')
+            continue
+
+        # Check word exists in DB
+        word_row = db.execute('SELECT id FROM word WHERE id = ?', (word_id,)).fetchone()
+        if not word_row:
+            errors.append(f'Skipped word {word_id} — not found in database')
+            skipped += 1
+            continue
+
+        # Download and save audio
+        try:
+            audio_data = gh_download(f_entry['download_url'])
+        except Exception as e:
+            errors.append(f'Failed to download "{name}": {e}')
+            continue
+
+        ts = int(datetime.now().timestamp() * 1000)
+        safe_ext = ext if ext in ('webm', 'ogg', 'mp4', 'm4a', 'wav') else 'webm'
+        new_filename = f'rec_{word_id}_{ts}_{uuid.uuid4().hex[:6]}.{safe_ext}'
+        filepath = os.path.join(AUDIO_DIR, new_filename)
+
+        with open(filepath, 'wb') as fout:
+            fout.write(audio_data)
+
+        db.execute(
+            'INSERT INTO recording (word_id, file_path, speaker_label, session_id, created_at) VALUES (?, ?, ?, ?, ?)',
+            (word_id, filepath, speaker_name, session_id, datetime.now().isoformat())
+        )
+        db.commit()
+        imported += 1
+
+    db.close()
+
+    return jsonify({
+        'imported': imported,
+        'skipped':  skipped,
+        'errors':   errors,
+        'speaker':  speaker_name,
+        'session_id': session_id,
     })
 
 
