@@ -1,35 +1,29 @@
-/**
- * train.js — End User training session controller
- *
- * Expects PACK_ID, INITIAL_PHASE, INITIAL_MASTERED, and INITIAL_TRIAL_LIMIT
- * to be defined in the page.
- *
- * Training algorithm: accuracy-weighted item selection with hard stop.
- * - Active training: 100 trials per session
- * - Review mode: 30 trials per session
- * - No SRS intervals — items are weighted by recent accuracy
- */
-
 (function () {
   'use strict';
 
+  const IS_DISC = typeof TRAINING_MODE !== 'undefined' && TRAINING_MODE === 'discrimination';
+
   // ── State ─────────────────────────────────────────────────────────────────
   const state = {
-    phase:       'loading',   // loading | presenting | answering | submitting | discrimination | done
-    trial:       null,        // current trial data from API
-    audioEl:     null,        // current Audio element
+    phase:       'loading',
+    trial:       null,
+    audioEl:     null,
     audioEnded:  false,
-    startTime:   null,        // when timer begins (audio end)
-    feedbackData: null,       // result from submit API
+    startTime:   null,
+    feedbackData: null,
     currentPhase: typeof INITIAL_PHASE !== 'undefined' ? INITIAL_PHASE : 1,
-    sessionStartTime: null,   // when the session started
+    sessionStartTime: null,
     sessionTimerInterval: null,
-    sessionEnded: false,       // whether end-session was sent
+    sessionEnded: false,
     trialNumber: 0,
     trialLimit: typeof INITIAL_TRIAL_LIMIT !== 'undefined' ? INITIAL_TRIAL_LIMIT : 100,
     mastered: typeof INITIAL_MASTERED !== 'undefined' ? INITIAL_MASTERED : false,
     sessionCorrect: 0,
     sessionTotal: 0,
+    // Discrimination-specific
+    discTrial: null,
+    discPlayed: { a: false, b: false },
+    discMasteryShown: false,
   };
 
   // ── DOM ───────────────────────────────────────────────────────────────────
@@ -61,12 +55,34 @@
   const advanceContinue = document.getElementById('advance-continue-btn');
   const masteryContinue = document.getElementById('mastery-continue-btn');
 
+  // Discrimination mode DOM
+  const discTrialDiv    = document.getElementById('phase-disc-trial');
+  const discTargetWord  = document.getElementById('disc-target-word');
+  const discPlayA       = document.getElementById('disc-play-a');
+  const discPlayB       = document.getElementById('disc-play-b');
+  const discLabelA      = document.getElementById('disc-label-a');
+  const discLabelB      = document.getElementById('disc-label-b');
+  const discAnswerPrompt = document.getElementById('disc-answer-prompt');
+  const discAnswerA     = document.getElementById('disc-answer-a');
+  const discAnswerB     = document.getElementById('disc-answer-b');
+  const discFeedback    = document.getElementById('disc-feedback');
+  const discAccuracy    = document.getElementById('disc-accuracy');
+  const discNextBtn     = document.getElementById('disc-next-btn');
+  const discMasteryModal = document.getElementById('disc-mastery-modal');
+  const discMasteryContinue = document.getElementById('disc-mastery-continue');
+
   // ── Phase display names ─────────────────────────────────────────────────
   const PHASE_NAMES = { 1: 'Synthetic', 2: 'All pairs' };
 
   function updatePhaseDisplay(phase) {
     state.currentPhase = phase;
-    if (phaseLabel) phaseLabel.textContent = PHASE_NAMES[phase] || 'All pairs';
+    if (phaseLabel) {
+      if (IS_DISC) {
+        phaseLabel.textContent = 'Discrimination';
+      } else {
+        phaseLabel.textContent = PHASE_NAMES[phase] || 'All pairs';
+      }
+    }
   }
 
   function updateTrialCounter() {
@@ -99,18 +115,15 @@
     doneSummary.hidden = false;
   }
 
-  function showItemAccuracy(acc, trials) {
-    if (!itemAccuracy) return;
-    if (acc === null || acc === undefined) {
-      itemAccuracy.hidden = true;
-      return;
-    }
-    itemAccuracy.textContent = `This pair: ${acc}% (last ${trials} trials)`;
-    itemAccuracy.hidden = false;
-    itemAccuracy.className = 'item-accuracy';
-    if (acc >= 85) itemAccuracy.classList.add('acc-high');
-    else if (acc >= 65) itemAccuracy.classList.add('acc-mid');
-    else itemAccuracy.classList.add('acc-low');
+  function showItemAccuracyBadge(el, acc, trials) {
+    if (!el) return;
+    if (acc === null || acc === undefined) { el.hidden = true; return; }
+    el.textContent = `This pair: ${acc}% (last ${trials} trials)`;
+    el.hidden = false;
+    el.className = 'item-accuracy';
+    if (acc >= 85) el.classList.add('acc-high');
+    else if (acc >= 65) el.classList.add('acc-mid');
+    else el.classList.add('acc-low');
   }
 
   // ── Session timer ───────────────────────────────────────────────────────
@@ -151,21 +164,37 @@
   // ── Entry point ─────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
     if (typeof PACK_ID === 'undefined') return;
-    replayBtn.addEventListener('click', () => replayAudio());
-    nextBtn.addEventListener('click', () => afterDiscrimination());
-    if (advanceContinue) {
-      advanceContinue.addEventListener('click', () => {
-        advanceModal.hidden = true;
-        loadTrial();
-      });
+
+    if (!IS_DISC) {
+      replayBtn.addEventListener('click', () => replayAudio());
+      nextBtn.addEventListener('click', () => afterDiscrimination());
+      if (advanceContinue) {
+        advanceContinue.addEventListener('click', () => {
+          advanceModal.hidden = true;
+          loadTrial();
+        });
+      }
+      if (masteryContinue) {
+        masteryContinue.addEventListener('click', () => {
+          masteryModal.hidden = true;
+          loadTrial();
+        });
+      }
+    } else {
+      // Discrimination mode listeners
+      if (discPlayA) discPlayA.addEventListener('click', () => playDiscOption(0));
+      if (discPlayB) discPlayB.addEventListener('click', () => playDiscOption(1));
+      if (discAnswerA) discAnswerA.addEventListener('click', () => submitDiscAnswer(0));
+      if (discAnswerB) discAnswerB.addEventListener('click', () => submitDiscAnswer(1));
+      if (discNextBtn) discNextBtn.addEventListener('click', () => loadTrial());
+      if (discMasteryContinue) {
+        discMasteryContinue.addEventListener('click', () => {
+          discMasteryModal.hidden = true;
+          loadTrial();
+        });
+      }
     }
-    if (masteryContinue) {
-      masteryContinue.addEventListener('click', () => {
-        masteryModal.hidden = true;
-        loadTrial();
-      });
-    }
-    // Send end-session when user navigates away
+
     window.addEventListener('beforeunload', () => {
       if (state.sessionStartTime && !state.sessionEnded) {
         navigator.sendBeacon('/api/end-session',
@@ -175,6 +204,7 @@
           })], { type: 'application/json' }));
       }
     });
+
     updateTrialCounter();
     startSessionTimer();
     loadTrial();
@@ -183,7 +213,11 @@
   // ── Load next trial ─────────────────────────────────────────────────────
   function loadTrial() {
     setPhase('loading');
-    fetch(`/api/trial/${PACK_ID}`)
+    const url = IS_DISC
+      ? `/api/discrimination-trial/${PACK_ID}`
+      : `/api/trial/${PACK_ID}`;
+
+    fetch(url)
       .then(r => r.json())
       .then(data => {
         if (data.done) {
@@ -195,35 +229,42 @@
           setPhase('done');
           return;
         }
-        state.trial      = data;
-        state.audioEnded = false;
-        state.startTime  = null;
-        state.trialNumber = data.trial_number || state.trialNumber;
-        state.trialLimit = data.trial_limit || state.trialLimit;
-        if (data.mastered !== undefined) state.mastered = data.mastered;
-        if (data.phase) updatePhaseDisplay(data.phase);
-        updateTrialCounter();
-        buildChoiceButtons();
-        setPhase('presenting');
-        playAudio();
+
+        if (IS_DISC) {
+          loadDiscriminationTrial(data);
+        } else {
+          loadIdentificationTrial(data);
+        }
       })
       .catch(() => {
         showError('Could not load next trial. Please refresh the page.');
       });
   }
 
-  // ── Audio ───────────────────────────────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════════════
+  // IDENTIFICATION MODE
+  // ══════════════════════════════════════════════════════════════════════════
+
+  function loadIdentificationTrial(data) {
+    state.trial      = data;
+    state.audioEnded = false;
+    state.startTime  = null;
+    state.trialNumber = data.trial_number || state.trialNumber;
+    state.trialLimit = data.trial_limit || state.trialLimit;
+    if (data.mastered !== undefined) state.mastered = data.mastered;
+    if (data.phase) updatePhaseDisplay(data.phase);
+    updateTrialCounter();
+    buildChoiceButtons();
+    setPhase('presenting');
+    playAudio();
+  }
+
   function playAudio() {
-    if (state.audioEl) {
-      state.audioEl.pause();
-      state.audioEl.src = '';
-    }
+    if (state.audioEl) { state.audioEl.pause(); state.audioEl.src = ''; }
     const el = new Audio(state.trial.recording_url);
     state.audioEl = el;
-
     setAudioStatus('Playing…');
     replayBtn.disabled = true;
-
     el.addEventListener('ended', () => {
       state.audioEnded = true;
       state.startTime  = Date.now();
@@ -231,13 +272,11 @@
       replayBtn.disabled = false;
       enableChoices();
     });
-
     el.addEventListener('error', () => {
       setAudioStatus('Audio failed to load.');
       replayBtn.disabled = false;
       enableChoices();
     });
-
     el.play().catch(() => {
       setAudioStatus('Tap Replay to hear the word.');
       replayBtn.disabled = false;
@@ -259,29 +298,24 @@
         enableChoices();
       }
     });
-    el.play().catch(() => {
-      setAudioStatus('');
-      replayBtn.disabled = false;
-    });
+    el.play().catch(() => { setAudioStatus(''); replayBtn.disabled = false; });
   }
 
   function setAudioStatus(msg) {
     if (audioStatus) audioStatus.textContent = msg;
   }
 
-  // ── Choices ─────────────────────────────────────────────────────────────
   function buildChoiceButtons() {
     choicesDiv.innerHTML = '';
     feedbackBanner.hidden = true;
     feedbackBanner.className = 'feedback-banner';
     if (itemAccuracy) itemAccuracy.hidden = true;
-
     for (const ch of state.trial.choices) {
       const btn = document.createElement('button');
-      btn.className          = 'choice-btn';
-      btn.textContent        = ch.label;
-      btn.dataset.wordId     = ch.word_id;
-      btn.disabled           = true;
+      btn.className      = 'choice-btn';
+      btn.textContent    = ch.label;
+      btn.dataset.wordId = ch.word_id;
+      btn.disabled       = true;
       btn.addEventListener('click', () => submitAnswer(ch.word_id));
       choicesDiv.appendChild(btn);
     }
@@ -290,18 +324,15 @@
   function enableChoices() {
     choicesDiv.querySelectorAll('.choice-btn').forEach(b => b.disabled = false);
   }
-
   function disableChoices() {
     choicesDiv.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
   }
 
-  // ── Submit answer ───────────────────────────────────────────────────────
   function submitAnswer(wordId) {
     if (state.phase !== 'presenting' && state.phase !== 'answering') return;
     const responseTime = state.startTime ? Date.now() - state.startTime : null;
     disableChoices();
     setPhase('submitting');
-
     fetch('/api/trial', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -326,29 +357,21 @@
           updateSessionScore(result.session_correct, result.session_total);
         }
         showFeedback(wordId, result);
-        showItemAccuracy(result.item_accuracy, result.item_accuracy_trials);
-        buildDiscrimination(result.discrimination);
-
-        // Check for phase advancement or mastery
+        showItemAccuracyBadge(itemAccuracy, result.item_accuracy, result.item_accuracy_trials);
+        buildIdentDiscrimination(result.discrimination);
         state.pendingAdvancement = result.phase_advanced ? result : null;
         state.pendingMastery = result.pack_mastered ? true : false;
-
         setPhase('discrimination');
       })
       .catch(() => showError('Could not submit answer. Please refresh.'));
   }
 
-  // ── Feedback ────────────────────────────────────────────────────────────
   function showFeedback(respondedId, result) {
     choicesDiv.querySelectorAll('.choice-btn').forEach(btn => {
       const wid = parseInt(btn.dataset.wordId, 10);
-      if (wid === result.stimulus_word_id) {
-        btn.classList.add('correct');
-      } else if (wid === respondedId && !result.correct) {
-        btn.classList.add('wrong');
-      }
+      if (wid === result.stimulus_word_id) btn.classList.add('correct');
+      else if (wid === respondedId && !result.correct) btn.classList.add('wrong');
     });
-
     feedbackBanner.hidden = false;
     if (result.correct) {
       feedbackBanner.textContent = '✓ Correct';
@@ -359,31 +382,25 @@
     }
   }
 
-  // ── After discrimination → check advancement/mastery then load next ────
   function afterDiscrimination() {
-    // Phase advancement modal
     if (state.pendingAdvancement) {
       const adv = state.pendingAdvancement;
       state.pendingAdvancement = null;
       showAdvancementModal(adv.new_phase);
       return;
     }
-
-    // Mastery modal
     if (state.pendingMastery) {
       state.pendingMastery = false;
       showMasteryModal();
       return;
     }
-
     loadTrial();
   }
 
   function showAdvancementModal(newPhase) {
     if (!advanceModal) { loadTrial(); return; }
-    const msg = 'You\'ve mastered the synthetic pairs! All pairs are now in the mix.';
     if (advanceTitle) advanceTitle.textContent = 'Level up!';
-    if (advanceMessage) advanceMessage.textContent = msg;
+    if (advanceMessage) advanceMessage.textContent = 'You\'ve mastered the synthetic pairs! All pairs are now in the mix.';
     advanceModal.hidden = false;
   }
 
@@ -392,67 +409,239 @@
     masteryModal.hidden = false;
   }
 
-  // ── Discrimination phase ────────────────────────────────────────────────
-  function buildDiscrimination(items) {
+  function buildIdentDiscrimination(items) {
     discrimGrid.innerHTML = '';
-    let currentDiscrimAudio = null;
-
+    let currentAudio = null;
     for (const item of items) {
       const btn = document.createElement('button');
       btn.className = 'discrim-btn';
-
       const playIcon = document.createElement('span');
       playIcon.className   = 'play-icon';
       playIcon.textContent = '▶';
-
       const label = document.createElement('span');
       label.textContent = item.label;
-
       btn.appendChild(playIcon);
       btn.appendChild(label);
-
       if (!item.recording_url) {
         btn.disabled = true;
         playIcon.textContent = '—';
       } else {
         btn.addEventListener('click', () => {
-          if (currentDiscrimAudio) {
-            currentDiscrimAudio.pause();
-            currentDiscrimAudio.src = '';
+          if (currentAudio) {
+            currentAudio.pause(); currentAudio.src = '';
             discrimGrid.querySelectorAll('.discrim-btn').forEach(b => {
               b.classList.remove('playing');
-              const icon = b.querySelector('.play-icon');
-              if (icon) icon.textContent = '▶';
+              const ic = b.querySelector('.play-icon');
+              if (ic) ic.textContent = '▶';
             });
           }
           const audio = new Audio(item.recording_url);
-          currentDiscrimAudio = audio;
+          currentAudio = audio;
           btn.classList.add('playing');
           playIcon.textContent = '■';
           audio.addEventListener('ended', () => {
             btn.classList.remove('playing');
             playIcon.textContent = '▶';
-            currentDiscrimAudio = null;
+            currentAudio = null;
           });
           audio.play().catch(() => {});
         });
       }
-
       discrimGrid.appendChild(btn);
     }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // DISCRIMINATION MODE
+  // ══════════════════════════════════════════════════════════════════════════
+
+  let discCurrentAudio = null;
+
+  function loadDiscriminationTrial(data) {
+    state.discTrial = data;
+    state.discPlayed = { a: false, b: false };
+    state.startTime = null;
+    state.trialNumber = data.trial_number || state.trialNumber;
+    state.trialLimit = data.trial_limit || state.trialLimit;
+    if (data.mastered !== undefined) state.mastered = data.mastered;
+    updateTrialCounter();
+
+    // Set target word
+    discTargetWord.textContent = data.target_label;
+
+    // Reset play buttons
+    discPlayA.className = 'disc-play-btn';
+    discPlayB.className = 'disc-play-btn';
+    discPlayA.querySelector('.disc-play-icon').textContent = '▶';
+    discPlayB.querySelector('.disc-play-icon').textContent = '▶';
+    discLabelA.hidden = true;
+    discLabelB.hidden = true;
+
+    // Reset answer area
+    discAnswerA.className = 'disc-answer-btn';
+    discAnswerB.className = 'disc-answer-btn';
+    discAnswerA.disabled = false;
+    discAnswerB.disabled = false;
+    discAnswerPrompt.textContent = 'Tap to listen, then select:';
+    discAnswerPrompt.hidden = false;
+
+    // Reset feedback
+    discFeedback.hidden = true;
+    discFeedback.className = 'feedback-banner';
+    discAccuracy.hidden = true;
+    discNextBtn.hidden = true;
+
+    setPhase('disc_trial');
+  }
+
+  function playDiscOption(idx) {
+    const option = state.discTrial.options[idx];
+    if (!option || !option.recording_url) return;
+
+    // Stop any current playback
+    if (discCurrentAudio) {
+      discCurrentAudio.pause();
+      discCurrentAudio.src = '';
+      discPlayA.classList.remove('playing');
+      discPlayB.classList.remove('playing');
+      discPlayA.querySelector('.disc-play-icon').textContent = '▶';
+      discPlayB.querySelector('.disc-play-icon').textContent = '▶';
+    }
+
+    const btn = idx === 0 ? discPlayA : discPlayB;
+    const icon = btn.querySelector('.disc-play-icon');
+    const audio = new Audio(option.recording_url);
+    discCurrentAudio = audio;
+
+    btn.classList.add('playing');
+    icon.textContent = '■';
+
+    audio.addEventListener('ended', () => {
+      btn.classList.remove('playing');
+      icon.textContent = '▶';
+      discCurrentAudio = null;
+    });
+
+    audio.play().catch(() => {
+      btn.classList.remove('playing');
+      icon.textContent = '▶';
+    });
+
+    // Track that this option was played
+    if (idx === 0) state.discPlayed.a = true;
+    else state.discPlayed.b = true;
+
+    // Start response timer after first play
+    if (!state.startTime) state.startTime = Date.now();
+  }
+
+  function submitDiscAnswer(idx) {
+    if (state.phase !== 'disc_trial') return;
+
+    const selected = state.discTrial.options[idx];
+    const responseTime = state.startTime ? Date.now() - state.startTime : null;
+
+    // Disable answer buttons
+    discAnswerA.disabled = true;
+    discAnswerB.disabled = true;
+
+    fetch('/api/discrimination-trial', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        item_id: state.discTrial.item_id,
+        target_word_id: state.discTrial.target_word_id,
+        selected_word_id: selected.word_id,
+        recording_id: selected.recording_id,
+        response_time_ms: responseTime,
+      }),
+    })
+      .then(r => r.json())
+      .then(result => {
+        if (result.trial_number) state.trialNumber = result.trial_number;
+        if (result.trial_limit) state.trialLimit = result.trial_limit;
+        updateTrialCounter();
+        if (result.session_correct !== undefined) {
+          state.sessionCorrect = result.session_correct;
+          state.sessionTotal = result.session_total;
+          updateSessionScore(result.session_correct, result.session_total);
+        }
+
+        // Show feedback
+        const correctIdx = state.discTrial.options.findIndex(
+          o => o.word_id === state.discTrial.target_word_id
+        );
+
+        // Style answer buttons
+        const correctBtn = correctIdx === 0 ? discAnswerA : discAnswerB;
+        const wrongBtn = correctIdx === 0 ? discAnswerB : discAnswerA;
+        correctBtn.classList.add('correct');
+        if (!result.correct) {
+          (idx === 0 ? discAnswerA : discAnswerB).classList.add('wrong');
+        }
+
+        // Reveal labels on play buttons
+        const optA = state.discTrial.options[0];
+        const optB = state.discTrial.options[1];
+        discLabelA.textContent = optA.label;
+        discLabelB.textContent = optB.label;
+        discLabelA.hidden = false;
+        discLabelB.hidden = false;
+
+        // Highlight play buttons
+        const correctPlayBtn = correctIdx === 0 ? discPlayA : discPlayB;
+        const wrongPlayBtn = correctIdx === 0 ? discPlayB : discPlayA;
+        correctPlayBtn.classList.add('correct-reveal');
+        wrongPlayBtn.classList.remove('correct-reveal', 'wrong-reveal');
+
+        // Feedback banner
+        discFeedback.hidden = false;
+        if (result.correct) {
+          discFeedback.textContent = '✓ Correct';
+          discFeedback.classList.add('correct');
+        } else {
+          discFeedback.textContent = '✗ Incorrect';
+          discFeedback.classList.add('incorrect');
+        }
+
+        // Item accuracy
+        showItemAccuracyBadge(discAccuracy, result.item_accuracy, result.item_accuracy_trials);
+
+        // Hide answer prompt, show next button
+        discAnswerPrompt.hidden = true;
+        discNextBtn.hidden = false;
+
+        // Check discrimination mastery
+        if (result.disc_mastered && !state.discMasteryShown) {
+          state.discMasteryShown = true;
+          // Show mastery modal after a brief delay
+          setTimeout(() => {
+            if (discMasteryModal) discMasteryModal.hidden = false;
+          }, 600);
+        }
+
+        setPhase('disc_feedback');
+      })
+      .catch(() => showError('Could not submit answer. Please refresh.'));
   }
 
   // ── Phase transitions ───────────────────────────────────────────────────
   function setPhase(phase) {
     state.phase = phase;
+    loadingDiv.hidden = (phase !== 'loading');
+    doneDiv.hidden    = (phase !== 'done');
 
-    loadingDiv.hidden       = (phase !== 'loading');
-    presentDiv.hidden       = (phase !== 'presenting' && phase !== 'answering' && phase !== 'submitting' && phase !== 'discrimination');
-    discrimDiv.hidden       = (phase !== 'discrimination');
-    doneDiv.hidden          = (phase !== 'done');
-
-    if (phase === 'discrimination') {
-      replayBtn.disabled = true;
+    if (IS_DISC) {
+      // Discrimination mode: hide identification elements
+      presentDiv.hidden = true;
+      discrimDiv.hidden = true;
+      discTrialDiv.hidden = (phase !== 'disc_trial' && phase !== 'disc_feedback');
+    } else {
+      // Identification mode: hide discrimination elements
+      if (discTrialDiv) discTrialDiv.hidden = true;
+      presentDiv.hidden = (phase !== 'presenting' && phase !== 'answering' && phase !== 'submitting' && phase !== 'discrimination');
+      discrimDiv.hidden = (phase !== 'discrimination');
+      if (phase === 'discrimination') replayBtn.disabled = true;
     }
   }
 

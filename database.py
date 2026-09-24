@@ -86,4 +86,11 @@ def init_db():
         );
     ''')
     conn.commit()
+
+    # Migration: add mode column to trial_log
+    cols = [row[1] for row in conn.execute("PRAGMA table_info(trial_log)").fetchall()]
+    if 'mode' not in cols:
+        conn.execute("ALTER TABLE trial_log ADD COLUMN mode TEXT NOT NULL DEFAULT 'identification'")
+        conn.commit()
+
     conn.close()

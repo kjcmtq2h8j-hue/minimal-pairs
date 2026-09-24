@@ -1,0 +1,1879 @@
+{
+  "id": 2,
+  "name": "Malayalam ന vs ണ Contrasts",
+  "description": "Minimal pairs contrasting the Malayalam nasals ന (dental nasal) and ണ (retroflex nasal). Mix of real words, mixed pairs, and synthetic words for phased training.",
+  "items": [
+    {
+      "id": 21,
+      "words": [
+        {
+          "id": 41,
+          "label": "മണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 9,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_21_1773608762341_ac1fc3.mp4"
+            },
+            {
+              "id": 192,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_41_1777969122251_c426f5.webm"
+            }
+          ]
+        },
+        {
+          "id": 42,
+          "label": "മനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 10,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_22_1773608762343_f84d79.mp4"
+            },
+            {
+              "id": 193,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_42_1777969122438_587b07.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "words": [
+        {
+          "id": 43,
+          "label": "കണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 11,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_23_1773608762345_4fd44c.mp4"
+            },
+            {
+              "id": 194,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_43_1777969122643_4b9e61.webm"
+            }
+          ]
+        },
+        {
+          "id": 44,
+          "label": "കനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 12,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_24_1773608762346_668fbd.mp4"
+            },
+            {
+              "id": 195,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_44_1777969122841_b0c314.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "words": [
+        {
+          "id": 45,
+          "label": "പണി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 13,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_25_1773608762348_839efb.mp4"
+            },
+            {
+              "id": 196,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_45_1777969123013_c082e2.webm"
+            }
+          ]
+        },
+        {
+          "id": 46,
+          "label": "പനി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 14,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_26_1773608762349_5f6e8b.mp4"
+            },
+            {
+              "id": 197,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_46_1777969123265_d52cf7.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "words": [
+        {
+          "id": 47,
+          "label": "കണി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 15,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_27_1773608762350_3cb1db.mp4"
+            },
+            {
+              "id": 198,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_47_1777969123437_9e1547.webm"
+            }
+          ]
+        },
+        {
+          "id": 48,
+          "label": "കനി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 16,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_28_1773608762351_d1f276.mp4"
+            },
+            {
+              "id": 199,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_48_1777969123629_a2fc0c.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "words": [
+        {
+          "id": 49,
+          "label": "അണു",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 17,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_29_1773608762352_aafd1b.mp4"
+            },
+            {
+              "id": 200,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_49_1777969123815_7a3408.webm"
+            }
+          ]
+        },
+        {
+          "id": 50,
+          "label": "അനു",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 18,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_30_1773608762353_251884.mp4"
+            },
+            {
+              "id": 201,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_50_1777969123987_51b8e4.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "words": [
+        {
+          "id": 51,
+          "label": "ഇണ",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 19,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_31_1773608762354_7dbbe6.mp4"
+            },
+            {
+              "id": 202,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_51_1777969124167_a048dd.webm"
+            }
+          ]
+        },
+        {
+          "id": 52,
+          "label": "ഇന",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 20,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_32_1773608762355_695049.mp4"
+            },
+            {
+              "id": 203,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_52_1777969124359_f0379c.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "words": [
+        {
+          "id": 53,
+          "label": "മണ",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 21,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_33_1773608762357_341288.mp4"
+            },
+            {
+              "id": 204,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_53_1777969124548_2b43da.webm"
+            }
+          ]
+        },
+        {
+          "id": 54,
+          "label": "മന",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 22,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_34_1773608762358_20d5fe.mp4"
+            },
+            {
+              "id": 205,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_54_1777969124750_7b9ca7.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "words": [
+        {
+          "id": 55,
+          "label": "പണ",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 23,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_35_1773608762359_ce52b6.mp4"
+            },
+            {
+              "id": 206,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_55_1777969124927_c76a47.webm"
+            }
+          ]
+        },
+        {
+          "id": 56,
+          "label": "പന",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 24,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_36_1773608762360_b52be6.mp4"
+            },
+            {
+              "id": 207,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_56_1777969125135_fdbb47.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "words": [
+        {
+          "id": 57,
+          "label": "വിണ",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 25,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_37_1773608762361_6c98b7.mp4"
+            },
+            {
+              "id": 208,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_57_1777969125332_4731ef.webm"
+            }
+          ]
+        },
+        {
+          "id": 58,
+          "label": "വിന",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 26,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_38_1773608762362_36d7eb.mp4"
+            },
+            {
+              "id": 209,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_58_1777969125507_9410a3.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "words": [
+        {
+          "id": 59,
+          "label": "തണി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 27,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_39_1773608762363_2fbf28.mp4"
+            },
+            {
+              "id": 210,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_59_1777969125687_f7a2e4.webm"
+            }
+          ]
+        },
+        {
+          "id": 60,
+          "label": "തനി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 28,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_40_1773608762364_18a962.mp4"
+            },
+            {
+              "id": 211,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_60_1777969125888_80fe5e.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "words": [
+        {
+          "id": 61,
+          "label": "ഉണ",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 29,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_41_1773608762365_4a736c.mp4"
+            },
+            {
+              "id": 212,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_61_1777969126093_1c58d7.webm"
+            }
+          ]
+        },
+        {
+          "id": 62,
+          "label": "ഉന",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 30,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_42_1773608762365_9579df.mp4"
+            },
+            {
+              "id": 213,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_62_1777969126286_f1309e.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "words": [
+        {
+          "id": 63,
+          "label": "കണ്ണ്",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 31,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_43_1773608762366_c4cdd5.mp4"
+            },
+            {
+              "id": 214,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_63_1777969126477_868d87.webm"
+            }
+          ]
+        },
+        {
+          "id": 64,
+          "label": "കന്ന്",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 32,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_44_1773608762367_b643ad.mp4"
+            },
+            {
+              "id": 215,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_64_1777969126659_aa844e.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "words": [
+        {
+          "id": 65,
+          "label": "ആണ",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 33,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_45_1773608762368_0cb7fa.mp4"
+            },
+            {
+              "id": 216,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_65_1777969126843_6c2926.webm"
+            }
+          ]
+        },
+        {
+          "id": 66,
+          "label": "ആന",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 34,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_46_1773608762369_3c6812.mp4"
+            },
+            {
+              "id": 217,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_66_1777969127043_60b1d0.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "words": [
+        {
+          "id": 67,
+          "label": "ഊണ",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 35,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_47_1773608762369_d29017.mp4"
+            },
+            {
+              "id": 218,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_67_1777969127223_73a280.webm"
+            }
+          ]
+        },
+        {
+          "id": 68,
+          "label": "ഊന",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 36,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_48_1773608762370_e0ee82.mp4"
+            },
+            {
+              "id": 219,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_68_1777969127412_8ca61a.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "words": [
+        {
+          "id": 69,
+          "label": "വാണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 37,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_49_1773608762371_87b3c0.mp4"
+            },
+            {
+              "id": 220,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_69_1777969127598_5bf2f9.webm"
+            }
+          ]
+        },
+        {
+          "id": 70,
+          "label": "വാനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 38,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_50_1773608762372_9fb6c0.mp4"
+            },
+            {
+              "id": 221,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_70_1777969127779_b27bbf.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "words": [
+        {
+          "id": 71,
+          "label": "ബാണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 39,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_51_1773608762372_674b3d.mp4"
+            },
+            {
+              "id": 222,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_71_1777969127960_8a1c51.webm"
+            }
+          ]
+        },
+        {
+          "id": 72,
+          "label": "ബാനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 40,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_52_1773608762374_231229.mp4"
+            },
+            {
+              "id": 223,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_72_1777969128149_aff931.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "words": [
+        {
+          "id": 73,
+          "label": "രണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 41,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_53_1773608762374_f53994.mp4"
+            },
+            {
+              "id": 224,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_73_1777969128339_ce5acd.webm"
+            }
+          ]
+        },
+        {
+          "id": 74,
+          "label": "രനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 42,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_54_1773608762375_1395ed.mp4"
+            },
+            {
+              "id": 225,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_74_1777969128527_cfba1d.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "words": [
+        {
+          "id": 75,
+          "label": "ഗണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 43,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_55_1773608762376_45f1ec.mp4"
+            },
+            {
+              "id": 226,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_75_1777969128720_9f34c5.webm"
+            }
+          ]
+        },
+        {
+          "id": 76,
+          "label": "ഗനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 44,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_56_1773608762377_245b67.mp4"
+            },
+            {
+              "id": 227,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_76_1777969128894_fa4280.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "words": [
+        {
+          "id": 77,
+          "label": "ഗുണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 45,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_57_1773608762378_a7fcdf.mp4"
+            },
+            {
+              "id": 228,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_77_1777969129094_505265.webm"
+            }
+          ]
+        },
+        {
+          "id": 78,
+          "label": "ഗുനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 46,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_58_1773608762379_e520a5.mp4"
+            },
+            {
+              "id": 229,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_78_1777969129280_45f46c.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "words": [
+        {
+          "id": 79,
+          "label": "ക്ഷണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 47,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_59_1773608762379_22913c.mp4"
+            },
+            {
+              "id": 230,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_79_1777969129460_1ef3be.webm"
+            }
+          ]
+        },
+        {
+          "id": 80,
+          "label": "ക്ഷനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 48,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_60_1773608762380_e3856d.mp4"
+            },
+            {
+              "id": 231,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_80_1777969129634_cbfd03.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "words": [
+        {
+          "id": 81,
+          "label": "മണൽ",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 49,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_61_1773608762381_e1987c.mp4"
+            },
+            {
+              "id": 232,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_81_1777969129827_992f4b.webm"
+            }
+          ]
+        },
+        {
+          "id": 82,
+          "label": "മനൽ",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 50,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_62_1773608762381_dcef74.mp4"
+            },
+            {
+              "id": 233,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_82_1777969130045_34faa9.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "words": [
+        {
+          "id": 83,
+          "label": "തണൽ",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 51,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_63_1773608762382_92533a.mp4"
+            },
+            {
+              "id": 234,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_83_1777969130247_96026f.webm"
+            }
+          ]
+        },
+        {
+          "id": 84,
+          "label": "തനൽ",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 52,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_64_1773608762383_bc95a8.mp4"
+            },
+            {
+              "id": 235,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_84_1777969130432_1c166e.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "words": [
+        {
+          "id": 85,
+          "label": "ചണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 53,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_65_1773608762384_786493.mp4"
+            },
+            {
+              "id": 236,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_85_1777969130617_c7bb79.webm"
+            }
+          ]
+        },
+        {
+          "id": 86,
+          "label": "ചനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 54,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_66_1773608762384_8bd2e1.mp4"
+            },
+            {
+              "id": 237,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_86_1777969130803_044e47.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "words": [
+        {
+          "id": 87,
+          "label": "തോണി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 55,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_67_1773608762385_f47ae5.mp4"
+            },
+            {
+              "id": 238,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_87_1777969131011_b2c560.webm"
+            }
+          ]
+        },
+        {
+          "id": 88,
+          "label": "തോനി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 56,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_68_1773608762386_f2a0a9.mp4"
+            },
+            {
+              "id": 239,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_88_1777969131206_9dfa3e.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "words": [
+        {
+          "id": 89,
+          "label": "മണി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 57,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_69_1773608762386_b6843e.mp4"
+            },
+            {
+              "id": 240,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_89_1777969131398_432342.webm"
+            }
+          ]
+        },
+        {
+          "id": 90,
+          "label": "മനി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 58,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_70_1773608762387_78e91e.mp4"
+            },
+            {
+              "id": 241,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_90_1777969131581_675127.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "words": [
+        {
+          "id": 91,
+          "label": "ഓണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 59,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_71_1773608762388_e61f0f.mp4"
+            },
+            {
+              "id": 242,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_91_1777969131775_35e213.webm"
+            }
+          ]
+        },
+        {
+          "id": 92,
+          "label": "ഓനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 60,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_72_1773608762388_aac902.mp4"
+            },
+            {
+              "id": 243,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_92_1777969131996_baa738.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "words": [
+        {
+          "id": 93,
+          "label": "ധണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 61,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_73_1773608762389_c34779.mp4"
+            },
+            {
+              "id": 244,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_93_1777969132172_1ab151.webm"
+            }
+          ]
+        },
+        {
+          "id": 94,
+          "label": "ധനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 62,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_74_1773608762390_e17e30.mp4"
+            },
+            {
+              "id": 245,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_94_1777969132366_7fb105.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "words": [
+        {
+          "id": 95,
+          "label": "ജണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 63,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_75_1773608762391_0888fd.mp4"
+            },
+            {
+              "id": 246,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_95_1777969132587_0c9113.webm"
+            }
+          ]
+        },
+        {
+          "id": 96,
+          "label": "ജനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 64,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_76_1773608762391_8d180f.mp4"
+            },
+            {
+              "id": 247,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_96_1777969132804_9d3231.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "words": [
+        {
+          "id": 97,
+          "label": "വണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 65,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_77_1773608762392_4478d2.mp4"
+            },
+            {
+              "id": 248,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_97_1777969132983_4afead.webm"
+            }
+          ]
+        },
+        {
+          "id": 98,
+          "label": "വനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 66,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_78_1773608762392_29ec71.mp4"
+            },
+            {
+              "id": 249,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_98_1777969133161_213c79.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "words": [
+        {
+          "id": 99,
+          "label": "കാണം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 67,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_79_1773608762393_6abd1a.mp4"
+            },
+            {
+              "id": 250,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_99_1777969133377_abe8e3.webm"
+            }
+          ]
+        },
+        {
+          "id": 100,
+          "label": "കാനം",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 68,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_80_1773608762393_38f2f9.mp4"
+            },
+            {
+              "id": 155,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_100_1777969114512_6df313.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "words": [
+        {
+          "id": 101,
+          "label": "കുണ",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 69,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_81_1773608762394_358924.mp4"
+            },
+            {
+              "id": 156,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_101_1777969114693_ead0c9.webm"
+            }
+          ]
+        },
+        {
+          "id": 102,
+          "label": "കുന",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 70,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_82_1773608762394_372482.mp4"
+            },
+            {
+              "id": 157,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_102_1777969114873_6c20fa.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "words": [
+        {
+          "id": 103,
+          "label": "തുണി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 71,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_83_1773608762395_761987.mp4"
+            },
+            {
+              "id": 158,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_103_1777969115085_73f9ff.webm"
+            }
+          ]
+        },
+        {
+          "id": 104,
+          "label": "തുനി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 72,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_84_1773608762395_6001f0.mp4"
+            },
+            {
+              "id": 159,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_104_1777969115283_39363b.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "words": [
+        {
+          "id": 105,
+          "label": "പുണ",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 73,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_85_1773608762396_c1b0df.mp4"
+            },
+            {
+              "id": 160,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_105_1777969115486_6aa0cc.webm"
+            }
+          ]
+        },
+        {
+          "id": 106,
+          "label": "പുന",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 74,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_86_1773608762397_a25f7f.mp4"
+            },
+            {
+              "id": 161,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_106_1777969115678_e69fef.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "words": [
+        {
+          "id": 107,
+          "label": "വണി",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 75,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_87_1773608762397_76e91e.mp4"
+            },
+            {
+              "id": 162,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_107_1777969115876_0cbc40.webm"
+            }
+          ]
+        },
+        {
+          "id": 108,
+          "label": "വനി",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 76,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_88_1773608762398_10e539.mp4"
+            },
+            {
+              "id": 163,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_108_1777969116075_8e9e9a.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "words": [
+        {
+          "id": 109,
+          "label": "ചിണ",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 77,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_89_1773608762399_8501d2.mp4"
+            },
+            {
+              "id": 164,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_109_1777969116267_1f17ae.webm"
+            }
+          ]
+        },
+        {
+          "id": 110,
+          "label": "ചിന",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 78,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_90_1773608762399_fb4c25.mp4"
+            },
+            {
+              "id": 165,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_110_1777969116450_af5658.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "words": [
+        {
+          "id": 111,
+          "label": "തണം",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 79,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_91_1773608762400_e0b1ba.mp4"
+            },
+            {
+              "id": 166,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_111_1777969116633_334937.webm"
+            }
+          ]
+        },
+        {
+          "id": 112,
+          "label": "തനം",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 80,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_92_1773608762400_390db4.mp4"
+            },
+            {
+              "id": 167,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_112_1777969116839_370eac.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "words": [
+        {
+          "id": 113,
+          "label": "ചുണു",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 81,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_93_1773608762401_df72a2.mp4"
+            },
+            {
+              "id": 168,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_113_1777969117034_543a62.webm"
+            }
+          ]
+        },
+        {
+          "id": 114,
+          "label": "ചുനു",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 82,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_94_1773608762401_d10481.mp4"
+            },
+            {
+              "id": 169,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_114_1777969117209_dcb7bb.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "words": [
+        {
+          "id": 115,
+          "label": "പെണു",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 83,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_95_1773608762402_0e43ce.mp4"
+            },
+            {
+              "id": 170,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_115_1777969117395_7ec326.webm"
+            }
+          ]
+        },
+        {
+          "id": 116,
+          "label": "പെനു",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 84,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_96_1773608762402_6db2ca.mp4"
+            },
+            {
+              "id": 171,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_116_1777969117593_331add.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "words": [
+        {
+          "id": 117,
+          "label": "കണിമ",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 85,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_97_1773608762403_7b1074.mp4"
+            },
+            {
+              "id": 172,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_117_1777969117780_62fd21.webm"
+            }
+          ]
+        },
+        {
+          "id": 118,
+          "label": "കനിമ",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 86,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_98_1773608762404_dd1bef.mp4"
+            },
+            {
+              "id": 173,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_118_1777969117974_709954.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "words": [
+        {
+          "id": 119,
+          "label": "തുണല",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 87,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_99_1773608762404_44eda0.mp4"
+            },
+            {
+              "id": 174,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_119_1777969118195_2c74a1.webm"
+            }
+          ]
+        },
+        {
+          "id": 120,
+          "label": "തുനല",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 88,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_100_1773608762405_055b7e.mp4"
+            },
+            {
+              "id": 175,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_120_1777969118482_1bf722.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "words": [
+        {
+          "id": 121,
+          "label": "വിണുക",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 89,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_101_1773608762405_4994a1.mp4"
+            },
+            {
+              "id": 176,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_121_1777969118767_5377b6.webm"
+            }
+          ]
+        },
+        {
+          "id": 122,
+          "label": "വിനുക",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 90,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_102_1773608762406_551a74.mp4"
+            },
+            {
+              "id": 177,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_122_1777969119248_90aad6.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "words": [
+        {
+          "id": 123,
+          "label": "പോണ",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 91,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_103_1773608762406_66339b.mp4"
+            },
+            {
+              "id": 178,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_123_1777969119510_e3ab14.webm"
+            }
+          ]
+        },
+        {
+          "id": 124,
+          "label": "പോന",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 92,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_104_1773608762407_2a8238.mp4"
+            },
+            {
+              "id": 179,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_124_1777969119690_03c0fd.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "words": [
+        {
+          "id": 125,
+          "label": "മാണു",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 93,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_105_1773608762407_32c80c.mp4"
+            },
+            {
+              "id": 180,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_125_1777969119888_8b4feb.webm"
+            }
+          ]
+        },
+        {
+          "id": 126,
+          "label": "മാനു",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 94,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_106_1773608762408_e3a18f.mp4"
+            },
+            {
+              "id": 181,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_126_1777969120076_1eacf8.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "words": [
+        {
+          "id": 127,
+          "label": "കൂണി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 95,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_107_1773608762408_1bf364.mp4"
+            },
+            {
+              "id": 182,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_127_1777969120281_08830e.webm"
+            }
+          ]
+        },
+        {
+          "id": 128,
+          "label": "കൂനി",
+          "type": "real",
+          "recordings": [
+            {
+              "id": 96,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_108_1773608762408_44fa68.mp4"
+            },
+            {
+              "id": 183,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_128_1777969120480_42532c.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "words": [
+        {
+          "id": 129,
+          "label": "തീണു",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 97,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_109_1773608762409_607e71.mp4"
+            },
+            {
+              "id": 184,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_129_1777969120679_790069.webm"
+            }
+          ]
+        },
+        {
+          "id": 130,
+          "label": "തീനു",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 98,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_110_1773608762409_cb27d9.mp4"
+            },
+            {
+              "id": 185,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_130_1777969120894_8aaa54.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "words": [
+        {
+          "id": 131,
+          "label": "വോണ",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 99,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_111_1773608762410_ea470e.mp4"
+            },
+            {
+              "id": 186,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_131_1777969121076_cbc398.webm"
+            }
+          ]
+        },
+        {
+          "id": 132,
+          "label": "വോന",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 100,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_112_1773608762410_193e7e.mp4"
+            },
+            {
+              "id": 187,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_132_1777969121254_ee2a2d.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "words": [
+        {
+          "id": 133,
+          "label": "ചിണല",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 101,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_113_1773608762411_d56464.mp4"
+            },
+            {
+              "id": 188,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_133_1777969121454_a7f2c8.webm"
+            }
+          ]
+        },
+        {
+          "id": 134,
+          "label": "ചിനല",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 102,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_114_1773608762411_c8187e.mp4"
+            },
+            {
+              "id": 189,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_134_1777969121659_6b7ecb.webm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "words": [
+        {
+          "id": 135,
+          "label": "പൂണം",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 103,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_115_1773608762412_583955.mp4"
+            },
+            {
+              "id": 190,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_135_1777969121836_ebd7b3.webm"
+            }
+          ]
+        },
+        {
+          "id": 136,
+          "label": "പൂനം",
+          "type": "synthetic",
+          "recordings": [
+            {
+              "id": 104,
+              "speaker": "Sangeetha",
+              "url": "../static/audio/rec_116_1773608762412_d7164b.mp4"
+            },
+            {
+              "id": 191,
+              "speaker": "Reshma",
+              "url": "../static/audio/rec_136_1777969122057_d955c7.webm"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

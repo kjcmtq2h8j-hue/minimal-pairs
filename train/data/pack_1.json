@@ -1,0 +1,347 @@
+{
+  "id": 1,
+  "name": "Malayalam ര vs റ Contrasts",
+  "description": "Minimal pairs contrasting the Malayalam rhotics ര (alveolar tap) and റ (retroflex/harder trill). Mix of real words and synthetic words.",
+  "items": [
+    {
+      "id": 1,
+      "words": [
+        {
+          "id": 1,
+          "label": "കര",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 2,
+          "label": "കറ",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "words": [
+        {
+          "id": 3,
+          "label": "കരി",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 4,
+          "label": "കറി",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "words": [
+        {
+          "id": 5,
+          "label": "മര",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 6,
+          "label": "മറ",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "words": [
+        {
+          "id": 7,
+          "label": "തര",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 8,
+          "label": "തറ",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "words": [
+        {
+          "id": 9,
+          "label": "പര",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 10,
+          "label": "പറ",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "words": [
+        {
+          "id": 11,
+          "label": "ഇര",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 12,
+          "label": "ഇറ",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "words": [
+        {
+          "id": 13,
+          "label": "ഉര",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 14,
+          "label": "ഉറ",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "words": [
+        {
+          "id": 15,
+          "label": "വര",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 16,
+          "label": "വറ",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "words": [
+        {
+          "id": 17,
+          "label": "അര",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 18,
+          "label": "അറ",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "words": [
+        {
+          "id": 19,
+          "label": "കുര",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 20,
+          "label": "കുറ",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "words": [
+        {
+          "id": 21,
+          "label": "പുര",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 22,
+          "label": "പുറ",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "words": [
+        {
+          "id": 23,
+          "label": "അരി",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 24,
+          "label": "അറി",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "words": [
+        {
+          "id": 25,
+          "label": "കുരു",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 26,
+          "label": "കുറു",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "words": [
+        {
+          "id": 27,
+          "label": "തിര",
+          "type": "real",
+          "recordings": []
+        },
+        {
+          "id": 28,
+          "label": "തിറ",
+          "type": "real",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "words": [
+        {
+          "id": 29,
+          "label": "നര",
+          "type": "mixed",
+          "recordings": []
+        },
+        {
+          "id": 30,
+          "label": "നറ",
+          "type": "mixed",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "words": [
+        {
+          "id": 31,
+          "label": "ചര",
+          "type": "mixed",
+          "recordings": []
+        },
+        {
+          "id": 32,
+          "label": "ചറ",
+          "type": "mixed",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "words": [
+        {
+          "id": 33,
+          "label": "ഹര",
+          "type": "mixed",
+          "recordings": []
+        },
+        {
+          "id": 34,
+          "label": "ഹറ",
+          "type": "mixed",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "words": [
+        {
+          "id": 35,
+          "label": "മുര",
+          "type": "mixed",
+          "recordings": []
+        },
+        {
+          "id": 36,
+          "label": "മുറ",
+          "type": "mixed",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "words": [
+        {
+          "id": 37,
+          "label": "ചിര",
+          "type": "mixed",
+          "recordings": []
+        },
+        {
+          "id": 38,
+          "label": "ചിറ",
+          "type": "mixed",
+          "recordings": []
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "words": [
+        {
+          "id": 39,
+          "label": "ഗര",
+          "type": "synthetic",
+          "recordings": []
+        },
+        {
+          "id": 40,
+          "label": "ഗറ",
+          "type": "synthetic",
+          "recordings": []
+        }
+      ]
+    }
+  ]
+}

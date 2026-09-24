@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal Pairs Training</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a href="." class="site-title">🎧 Minimal Pairs</a>
+  <nav id="breadcrumb" class="breadcrumb"></nav>
+</header>
+
+<main>
+
+  <!-- ── Pack list ── -->
+  <div id="screen-packs" class="screen">
+    <div class="pack-header"><h1>Choose a Pack to Practise</h1></div>
+    <div id="pack-list"></div>
+    <div id="packs-loading" class="loading-msg">Loading packs…</div>
+    <div id="packs-error" class="loading-msg" hidden style="color:var(--red);"></div>
+  </div>
+
+  <!-- ── Mode selection ── -->
+  <div id="screen-mode" class="screen" hidden>
+    <div style="max-width:480px; margin:0 auto;">
+      <h1 id="mode-pack-name" style="margin-bottom:1.25rem;"></h1>
+      <div style="display:grid; gap:1rem;">
+        <div id="mode-disc-card" class="card mode-card" style="border-left:4px solid var(--amber); cursor:pointer;">
+          <h2 style="margin-bottom:.35rem;">Discrimination</h2>
+          <p class="text-muted" style="margin-bottom:.5rem;">Hear two sounds, pick which matches the target word.</p>
+          <p style="font-size:.82rem; color:var(--text-muted);">Best for learning to hear the difference.</p>
+          <div id="mode-disc-stats" class="mt-1 flex-row" style="gap:.4rem;" hidden></div>
+        </div>
+        <div id="mode-ident-card" class="card mode-card" style="border-left:4px solid var(--blue); cursor:pointer;">
+          <h2 style="margin-bottom:.35rem;">Identification</h2>
+          <p class="text-muted" style="margin-bottom:.5rem;">Hear one sound, identify which word it is.</p>
+          <p style="font-size:.82rem; color:var(--text-muted);">Best for building recognition in real speech.</p>
+          <div id="mode-ident-stats" class="mt-1 flex-row" style="gap:.4rem;" hidden></div>
+          <div id="mode-ident-hint" class="mt-1" hidden
+               style="background:#dcfce7; color:#166534; padding:.5rem .75rem; border-radius:8px; font-size:.85rem;">
+            You've mastered discrimination — try this mode to build deeper recognition.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Training ── -->
+  <div id="screen-train" class="screen" hidden>
+    <div class="train-shell">
+
+      <div class="train-session-header">
+        <div class="phase-indicator">
+          <span id="phase-label"></span>
+        </div>
+        <div class="session-info">
+          <span id="trial-counter" class="trial-counter"></span>
+          <span id="session-score" class="session-score" hidden></span>
+          <span id="session-timer" class="session-timer">0:00</span>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="train-loading" class="train-card">
+        <p class="loading-msg">Loading…</p>
+      </div>
+
+      <!-- Identification trial -->
+      <div id="train-ident" class="train-card" hidden>
+        <div class="audio-area">
+          <div class="phase-label">Listen and identify the word</div>
+          <div id="ident-audio-status" class="audio-status">Playing…</div>
+          <button id="ident-replay" class="replay-btn" disabled>▶ Replay</button>
+        </div>
+        <div id="ident-choices" class="choices"></div>
+        <div id="ident-feedback" class="feedback-banner" hidden></div>
+        <div id="ident-accuracy" class="item-accuracy" hidden></div>
+      </div>
+
+      <!-- Identification comparison phase -->
+      <div id="train-compare" class="train-card" hidden>
+        <div class="phase-label">Compare — tap any word to hear it</div>
+        <div class="discrim-label">You can listen to each word as many times as you like.</div>
+        <div id="compare-grid" class="discrim-grid"></div>
+        <button id="compare-next" class="btn btn-primary btn-lg w-full">Next →</button>
+      </div>
+
+      <!-- Discrimination trial -->
+      <div id="train-disc" class="train-card" hidden>
+        <div class="phase-label">Which is:</div>
+        <div id="disc-target" class="disc-target-word"></div>
+        <div class="disc-play-area">
+          <button id="disc-play-a" class="disc-play-btn">
+            <span class="disc-letter">A</span>
+            <span class="disc-play-icon">▶</span>
+            <span id="disc-label-a" class="disc-reveal" hidden></span>
+          </button>
+          <button id="disc-play-b" class="disc-play-btn">
+            <span class="disc-letter">B</span>
+            <span class="disc-play-icon">▶</span>
+            <span id="disc-label-b" class="disc-reveal" hidden></span>
+          </button>
+        </div>
+        <div id="disc-prompt" class="disc-answer-prompt">Tap to listen, then select:</div>
+        <div class="disc-answer-area">
+          <button id="disc-ans-a" class="disc-answer-btn">A</button>
+          <button id="disc-ans-b" class="disc-answer-btn">B</button>
+        </div>
+        <div id="disc-feedback" class="feedback-banner" hidden></div>
+        <div id="disc-accuracy" class="item-accuracy" hidden></div>
+        <button id="disc-next" class="btn btn-primary btn-lg w-full" hidden>Next →</button>
+      </div>
+
+      <!-- Discrimination mastery modal -->
+      <div id="disc-mastery-modal" class="modal-overlay" hidden>
+        <div class="modal-card">
+          <div style="font-size:3rem; margin-bottom:.75rem;">🎯</div>
+          <h2>Discrimination mastered!</h2>
+          <p class="text-muted mt-1 mb-2">You can reliably tell these sounds apart. Try Identification mode for deeper recognition.</p>
+          <div style="display:flex; flex-direction:column; gap:.5rem;">
+            <button id="disc-mastery-try-ident" class="btn btn-primary btn-lg" style="justify-content:center;">Try Identification →</button>
+            <button id="disc-mastery-continue" class="btn btn-outline btn-lg" style="justify-content:center;">Keep practising</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Identification mastery modal -->
+      <div id="ident-mastery-modal" class="modal-overlay" hidden>
+        <div class="modal-card">
+          <div style="font-size:3rem; margin-bottom:.75rem;">🏆</div>
+          <h2>Pack mastered!</h2>
+          <p class="text-muted mt-1 mb-2">You've reached 85% accuracy on all pairs. Future sessions will be shorter review sessions.</p>
+          <button id="ident-mastery-continue" class="btn btn-primary btn-lg">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Done -->
+      <div id="train-done" class="train-card" hidden>
+        <div class="done-msg">
+          <div style="font-size:3rem; margin-bottom:.75rem;">✅</div>
+          <h2>You're done for today</h2>
+          <div id="done-summary" class="done-summary" hidden></div>
+          <p class="text-muted mt-1 mb-2">Great work! Come back tomorrow to continue training.</p>
+          <button id="done-home" class="btn btn-primary">Back to Home</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+<script src="app.js"></script>
+</body>
+</html>

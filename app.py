@@ -73,18 +73,26 @@ def get_eligible_item_ids(db, pack_id, phase):
     return item_ids
 
 
-def get_item_accuracies(db, pack_id, item_ids):
+def get_item_accuracies(db, pack_id, item_ids, mode=None):
     """Calculate rolling accuracy (last MASTERY_WINDOW trials) for each item.
     Returns {item_id: {'accuracy': float, 'total': int, 'correct': int}}
     Items with no trials get accuracy 0.5 (neutral weight).
+    If mode is set, only counts trials of that mode.
     """
     accuracies = {}
     for item_id in item_ids:
-        trials = db.execute('''
-            SELECT correct FROM trial_log
-            WHERE item_id = ?
-            ORDER BY id DESC LIMIT ?
-        ''', (item_id, MASTERY_WINDOW)).fetchall()
+        if mode:
+            trials = db.execute('''
+                SELECT correct FROM trial_log
+                WHERE item_id = ? AND mode = ?
+                ORDER BY id DESC LIMIT ?
+            ''', (item_id, mode, MASTERY_WINDOW)).fetchall()
+        else:
+            trials = db.execute('''
+                SELECT correct FROM trial_log
+                WHERE item_id = ?
+                ORDER BY id DESC LIMIT ?
+            ''', (item_id, MASTERY_WINDOW)).fetchall()
         total = len(trials)
         if total == 0:
             accuracies[item_id] = {'accuracy': 0.5, 'total': 0, 'correct': 0}
@@ -183,8 +191,8 @@ def get_next_trial(db, pack_id):
     if not item_ids:
         return None
 
-    # Get accuracy data for weighting
-    accuracies = get_item_accuracies(db, pack_id, item_ids)
+    # Get accuracy data for weighting (identification only)
+    accuracies = get_item_accuracies(db, pack_id, item_ids, mode='identification')
 
     # Calculate selection weights: weaker items get higher weight
     weights = []
@@ -860,6 +868,7 @@ def user_index():
 
 @app.route('/user/train/<int:pack_id>')
 def user_train(pack_id):
+    mode = request.args.get('mode')
     db = get_db()
     pack = db.execute(
         'SELECT * FROM pack WHERE id = ? AND published = 1', (pack_id,)
@@ -867,6 +876,29 @@ def user_train(pack_id):
     if not pack:
         db.close()
         return redirect(url_for('user_index'))
+
+    if not mode:
+        # Show mode selection page
+        item_ids = [r['id'] for r in
+                    db.execute('SELECT id FROM item WHERE pack_id = ?', (pack_id,)).fetchall()]
+        disc_accs = get_item_accuracies(db, pack_id, item_ids, mode='discrimination')
+        ident_accs = get_item_accuracies(db, pack_id, item_ids, mode='identification')
+        disc_trials = sum(d['total'] for d in disc_accs.values())
+        ident_trials = sum(d['total'] for d in ident_accs.values())
+        disc_acc = get_pack_accuracy(disc_accs) if disc_trials > 0 else None
+        ident_acc = get_pack_accuracy(ident_accs) if ident_trials > 0 else None
+        disc_mastered = check_pack_mastery(disc_accs)
+        ts = get_or_create_training_state(db, pack_id)
+        ident_mastered = bool(ts['mastered'])
+        db.close()
+        return render_template('user/choose_mode.html',
+                               pack=pack,
+                               disc_accuracy=round(disc_acc * 100) if disc_acc else None,
+                               disc_trials=disc_trials,
+                               disc_mastered=disc_mastered,
+                               ident_accuracy=round(ident_acc * 100) if ident_acc else None,
+                               ident_trials=ident_trials,
+                               ident_mastered=ident_mastered)
 
     ensure_directional_records(db, pack_id)
     ts = get_or_create_training_state(db, pack_id)
@@ -877,8 +909,10 @@ def user_train(pack_id):
     session['trial_count'] = 0
     session['session_correct'] = 0
     session['current_pack'] = pack_id
+    session['training_mode'] = mode
     return render_template('user/train.html', pack=pack, phase=ts['phase'],
-                           mastered=is_mastered, trial_limit=trial_limit)
+                           mastered=is_mastered, trial_limit=trial_limit,
+                           mode=mode)
 
 
 # ── Training API ─────────────────────────────────────────────────────────────
@@ -912,8 +946,8 @@ def api_submit_trial():
     db.execute('''
         INSERT INTO trial_log
             (item_id, pack_id, stimulus_word_id, recording_id,
-             response_word_id, correct, response_time_ms)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+             response_word_id, correct, response_time_ms, mode)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'identification')
     ''', (item_id, pack_id, stimulus_word_id, recording_id,
           response_word_id, 1 if correct else 0, response_time_ms))
 
@@ -937,9 +971,9 @@ def api_submit_trial():
     new_phase = ts['phase']
     was_mastered = bool(ts['mastered'])
 
-    # Get eligible items and their accuracies
+    # Get eligible items and their accuracies (identification only)
     item_ids = get_eligible_item_ids(db, pack_id, ts['phase'])
-    accuracies = get_item_accuracies(db, pack_id, item_ids)
+    accuracies = get_item_accuracies(db, pack_id, item_ids, mode='identification')
 
     if ts['phase'] == 1:
         # Phase 1 → 2: all synthetic items at mastery threshold
@@ -950,7 +984,7 @@ def api_submit_trial():
             phase_advanced = True
             # Recalculate with full pool for mastery check below
             item_ids = get_eligible_item_ids(db, pack_id, 2)
-            accuracies = get_item_accuracies(db, pack_id, item_ids)
+            accuracies = get_item_accuracies(db, pack_id, item_ids, mode='identification')
 
     # Check pack mastery (all items in current pool at threshold)
     if not was_mastered and check_pack_mastery(accuracies):
@@ -1001,8 +1035,8 @@ def api_submit_trial():
             'recording_url': rec_url,
         })
 
-    # Per-item accuracy (rolling last 20) for the item just answered
-    item_acc_data = get_item_accuracies(db, pack_id, [item_id])
+    # Per-item accuracy (rolling last 20, identification only)
+    item_acc_data = get_item_accuracies(db, pack_id, [item_id], mode='identification')
     item_acc = item_acc_data.get(item_id, {'accuracy': 0.5, 'total': 0, 'correct': 0})
 
     db.commit()
@@ -1025,6 +1059,153 @@ def api_submit_trial():
         result['new_phase'] = new_phase
     if pack_mastered:
         result['pack_mastered'] = True
+    return jsonify(result)
+
+
+# ── Discrimination Training ──────────────────────────────────────────────────
+
+def get_next_discrimination_trial(db, pack_id):
+    """Pick two recordings (one per word) for a discrimination trial.
+    Returns both options in random order with a target word to identify.
+    """
+    ts = get_or_create_training_state(db, pack_id)
+    current_phase = ts['phase']
+    is_mastered = bool(ts['mastered'])
+
+    trial_count = session.get('trial_count', 0)
+    trial_limit = REVIEW_TRIAL_LIMIT if is_mastered else ACTIVE_TRIAL_LIMIT
+    if trial_count >= trial_limit:
+        return {'done': True, 'trial_number': trial_count, 'trial_limit': trial_limit}
+
+    item_ids = get_eligible_item_ids(db, pack_id, current_phase)
+    if current_phase == 1 and not item_ids:
+        db.execute('UPDATE training_state SET phase = 2, phase_advanced_at = datetime(?) WHERE pack_id = ?',
+                   (datetime.now().isoformat(), pack_id))
+        db.commit()
+        current_phase = 2
+        item_ids = get_eligible_item_ids(db, pack_id, current_phase)
+
+    if not item_ids:
+        return None
+
+    accuracies = get_item_accuracies(db, pack_id, item_ids, mode='discrimination')
+    weights = [max(0.05, 1.0 - accuracies.get(iid, {'accuracy': 0.5})['accuracy']) for iid in item_ids]
+    chosen_item_id = random.choices(item_ids, weights=weights, k=1)[0]
+
+    words = db.execute('SELECT id, label FROM word WHERE item_id = ?', (chosen_item_id,)).fetchall()
+    if not words or len(words) < 2:
+        return None
+
+    word_ids = [w['id'] for w in words]
+    eligible_speakers = db.execute('''
+        SELECT speaker_label FROM recording
+        WHERE word_id IN ({})
+        GROUP BY speaker_label
+        HAVING COUNT(DISTINCT word_id) = ?
+    '''.format(','.join('?' * len(word_ids))),
+        word_ids + [len(word_ids)]
+    ).fetchall()
+
+    if not eligible_speakers:
+        return None
+
+    speaker = random.choice(eligible_speakers)['speaker_label']
+    target_word = random.choice(words)
+
+    options = []
+    for w in words:
+        rec = db.execute(
+            'SELECT * FROM recording WHERE word_id = ? AND speaker_label = ? ORDER BY RANDOM() LIMIT 1',
+            (w['id'], speaker)
+        ).fetchone()
+        if not rec:
+            return None
+        rec_filename = os.path.basename(rec['file_path'])
+        options.append({
+            'word_id': w['id'],
+            'label': w['label'],
+            'recording_id': rec['id'],
+            'recording_url': url_for('static', filename=f'audio/{rec_filename}'),
+        })
+
+    random.shuffle(options)
+
+    return {
+        'item_id': chosen_item_id,
+        'target_word_id': target_word['id'],
+        'target_label': target_word['label'],
+        'options': options,
+        'phase': current_phase,
+        'trial_number': trial_count + 1,
+        'trial_limit': trial_limit,
+        'mastered': is_mastered,
+    }
+
+
+@app.route('/api/discrimination-trial/<int:pack_id>')
+def api_get_discrimination_trial(pack_id):
+    db = get_db()
+    trial = get_next_discrimination_trial(db, pack_id)
+    db.close()
+    if trial is None:
+        return jsonify({'done': True})
+    return jsonify(trial)
+
+
+@app.route('/api/discrimination-trial', methods=['POST'])
+def api_submit_discrimination_trial():
+    data = request.get_json(force=True)
+    item_id = data['item_id']
+    target_word_id = data['target_word_id']
+    selected_word_id = data['selected_word_id']
+    recording_id = data.get('recording_id', 0)
+    response_time_ms = data.get('response_time_ms')
+
+    correct = (target_word_id == selected_word_id)
+
+    db = get_db()
+    item = db.execute('SELECT pack_id FROM item WHERE id = ?', (item_id,)).fetchone()
+    pack_id = item['pack_id']
+
+    db.execute('''
+        INSERT INTO trial_log
+            (item_id, pack_id, stimulus_word_id, recording_id,
+             response_word_id, correct, response_time_ms, mode)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'discrimination')
+    ''', (item_id, pack_id, target_word_id, recording_id,
+          selected_word_id, 1 if correct else 0, response_time_ms))
+
+    trial_count = session.get('trial_count', 0) + 1
+    session['trial_count'] = trial_count
+    session_correct = session.get('session_correct', 0) + (1 if correct else 0)
+    session['session_correct'] = session_correct
+
+    item_acc_data = get_item_accuracies(db, pack_id, [item_id], mode='discrimination')
+    item_acc = item_acc_data.get(item_id, {'accuracy': 0.5, 'total': 0, 'correct': 0})
+
+    ts = get_or_create_training_state(db, pack_id)
+    all_item_ids = get_eligible_item_ids(db, pack_id, ts['phase'])
+    disc_accuracies = get_item_accuracies(db, pack_id, all_item_ids, mode='discrimination')
+    disc_mastered = check_pack_mastery(disc_accuracies)
+
+    is_mastered = bool(ts['mastered'])
+    trial_limit = REVIEW_TRIAL_LIMIT if is_mastered else ACTIVE_TRIAL_LIMIT
+
+    db.commit()
+    db.close()
+
+    result = {
+        'correct': correct,
+        'target_word_id': target_word_id,
+        'trial_number': trial_count,
+        'trial_limit': trial_limit,
+        'session_correct': session_correct,
+        'session_total': trial_count,
+        'item_accuracy': round(item_acc['accuracy'] * 100) if item_acc['total'] > 0 else None,
+        'item_accuracy_trials': item_acc['total'],
+    }
+    if disc_mastered:
+        result['disc_mastered'] = True
     return jsonify(result)
 
 

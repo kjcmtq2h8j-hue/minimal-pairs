@@ -7,7 +7,9 @@
   <span class="sep"></span>
   <a href="/user/">Training</a>
   <span class="sep"></span>
-  {{ pack.name }}
+  <a href="/user/train/{{ pack.id }}">{{ pack.name }}</a>
+  <span class="sep"></span>
+  {{ 'Discrimination' if mode == 'discrimination' else 'Identification' }}
 </nav>
 {% endblock %}
 
@@ -17,7 +19,9 @@
   {# ── Session header: phase + trial counter + timer ── #}
   <div class="train-session-header">
     <div id="phase-indicator" class="phase-indicator">
-      <span id="phase-label">{% if mastered %}Mastered{% elif phase == 1 %}Synthetic{% else %}All pairs{% endif %}</span>
+      <span id="phase-label">
+        {% if mode == 'discrimination' %}Discrimination{% elif mastered %}Mastered{% elif phase == 1 %}Synthetic{% else %}All pairs{% endif %}
+      </span>
       {% if mastered %}<span class="mode-badge review">Review</span>{% endif %}
     </div>
     <div class="session-info">
@@ -32,7 +36,7 @@
     <p class="loading-msg">Loading…</p>
   </div>
 
-  {# ── Present / Answer / Feedback ── #}
+  {# ── Identification: Present / Answer / Feedback ── #}
   <div id="phase-present" class="train-card" hidden>
 
     <div class="audio-area">
@@ -50,7 +54,7 @@
 
   </div>
 
-  {# ── Discrimination phase ── #}
+  {# ── Identification: Discrimination/comparison phase after answer ── #}
   <div id="phase-discrim" class="train-card" hidden>
     <div class="phase-label">Compare — tap any word to hear it</div>
     <div class="discrim-label">You can listen to each word as many times as you like.</div>
@@ -60,6 +64,49 @@
     </div>
 
     <button id="next-btn" class="btn btn-primary btn-lg w-full">Next →</button>
+  </div>
+
+  {# ── Discrimination mode: Trial ── #}
+  <div id="phase-disc-trial" class="train-card" hidden>
+    <div class="phase-label">Which is:</div>
+    <div id="disc-target-word" class="disc-target-word"></div>
+
+    <div class="disc-play-area">
+      <button id="disc-play-a" class="disc-play-btn">
+        <span class="disc-letter">A</span>
+        <span class="disc-play-icon">▶</span>
+        <span id="disc-label-a" class="disc-reveal" hidden></span>
+      </button>
+      <button id="disc-play-b" class="disc-play-btn">
+        <span class="disc-letter">B</span>
+        <span class="disc-play-icon">▶</span>
+        <span id="disc-label-b" class="disc-reveal" hidden></span>
+      </button>
+    </div>
+
+    <div id="disc-answer-prompt" class="disc-answer-prompt">Tap to listen, then select:</div>
+
+    <div class="disc-answer-area">
+      <button id="disc-answer-a" class="disc-answer-btn">A</button>
+      <button id="disc-answer-b" class="disc-answer-btn">B</button>
+    </div>
+
+    <div id="disc-feedback" class="feedback-banner" hidden></div>
+    <div id="disc-accuracy" class="item-accuracy" hidden></div>
+    <button id="disc-next-btn" class="btn btn-primary btn-lg w-full" hidden>Next →</button>
+  </div>
+
+  {# ── Discrimination mastery suggestion modal ── #}
+  <div id="disc-mastery-modal" class="phase-advance-modal" hidden>
+    <div class="phase-advance-card">
+      <div style="font-size:3rem; margin-bottom:.75rem;">🎯</div>
+      <h2>Discrimination mastered!</h2>
+      <p class="text-muted mt-1 mb-2">You can reliably tell these sounds apart. Try Identification mode to build deeper recognition.</p>
+      <div style="display:flex; flex-direction:column; gap:.5rem;">
+        <a href="/user/train/{{ pack.id }}?mode=identification" class="btn btn-primary btn-lg" style="justify-content:center;">Try Identification →</a>
+        <button id="disc-mastery-continue" class="btn btn-outline btn-lg" style="justify-content:center;">Keep practising</button>
+      </div>
+    </div>
   </div>
 
   {# ── Phase advancement celebration ── #}
@@ -102,6 +149,7 @@ const PACK_ID = {{ pack.id }};
 const INITIAL_PHASE = {{ phase }};
 const INITIAL_MASTERED = {{ 'true' if mastered else 'false' }};
 const INITIAL_TRIAL_LIMIT = {{ trial_limit }};
+const TRAINING_MODE = '{{ mode }}';
 </script>
 <script src="{{ url_for('static', filename='js/train.js') }}"></script>
 {% endblock %}

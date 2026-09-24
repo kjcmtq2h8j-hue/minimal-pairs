@@ -1,0 +1,16 @@
+[
+  {
+    "id": 2,
+    "name": "Malayalam ന vs ണ Contrasts",
+    "description": "Minimal pairs contrasting the Malayalam nasals ന (dental nasal) and ണ (retroflex nasal). Mix of real words, mixed pairs, and synthetic words for phased training.",
+    "file": "pack_2.json",
+    "itemCount": 48
+  },
+  {
+    "id": 1,
+    "name": "Malayalam ര vs റ Contrasts",
+    "description": "Minimal pairs contrasting the Malayalam rhotics ര (alveolar tap) and റ (retroflex/harder trill). Mix of real words and synthetic words.",
+    "file": "pack_1.json",
+    "itemCount": 20
+  }
+]

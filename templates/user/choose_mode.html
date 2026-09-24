@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ pack.name }} — Choose Mode{% endblock %}
+
+{% block nav %}
+<nav class="breadcrumb">
+  <a href="/">Home</a>
+  <span class="sep"></span>
+  <a href="/user/">Training</a>
+  <span class="sep"></span>
+  {{ pack.name }}
+</nav>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:480px; margin:0 auto;">
+  <h1 style="margin-bottom:1.25rem;">{{ pack.name }}</h1>
+
+  <div style="display:grid; gap:1rem;">
+
+    <a href="/user/train/{{ pack.id }}?mode=discrimination" style="text-decoration:none; color:inherit;">
+      <div class="card" style="cursor:pointer; transition: box-shadow .2s, transform .15s; border-left: 4px solid var(--amber);"
+           onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,.12)'; this.style.transform='translateY(-2px)'"
+           onmouseout="this.style.boxShadow=''; this.style.transform=''">
+        <h2 style="margin-bottom:.35rem;">Discrimination</h2>
+        <p class="text-muted" style="margin-bottom:.5rem;">Hear two sounds, pick which matches the target word.</p>
+        <p style="font-size:.82rem; color:var(--text-muted);">Best for learning to hear the difference.</p>
+        {% if disc_trials > 0 %}
+          <div class="mt-1 flex-row" style="gap:.4rem;">
+            <span class="badge badge-blue">{{ disc_accuracy }}%</span>
+            <span class="badge badge-grey">{{ disc_trials }} trials</span>
+            {% if disc_mastered %}<span class="badge badge-green">Mastered</span>{% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </a>
+
+    <a href="/user/train/{{ pack.id }}?mode=identification" style="text-decoration:none; color:inherit;">
+      <div class="card" style="cursor:pointer; transition: box-shadow .2s, transform .15s; border-left: 4px solid var(--blue);"
+           onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,.12)'; this.style.transform='translateY(-2px)'"
+           onmouseout="this.style.boxShadow=''; this.style.transform=''">
+        <h2 style="margin-bottom:.35rem;">Identification</h2>
+        <p class="text-muted" style="margin-bottom:.5rem;">Hear one sound, identify which word it is.</p>
+        <p style="font-size:.82rem; color:var(--text-muted);">Best for building recognition in real speech.</p>
+        {% if ident_trials > 0 %}
+          <div class="mt-1 flex-row" style="gap:.4rem;">
+            <span class="badge badge-blue">{{ ident_accuracy }}%</span>
+            <span class="badge badge-grey">{{ ident_trials }} trials</span>
+            {% if ident_mastered %}<span class="badge badge-green">Mastered</span>{% endif %}
+          </div>
+        {% endif %}
+        {% if disc_mastered and not ident_mastered %}
+          <div class="mt-1" style="background:#dcfce7; color:#166534; padding:.5rem .75rem; border-radius:8px; font-size:.85rem;">
+            You've mastered discrimination — try this mode to build deeper recognition.
+          </div>
+        {% endif %}
+      </div>
+    </a>
+
+  </div>
+</div>
+{% endblock %}
