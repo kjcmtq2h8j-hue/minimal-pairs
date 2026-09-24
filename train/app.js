@@ -365,7 +365,6 @@
   function setTrainPhase(phase) {
     $('train-loading').hidden = phase !== 'loading';
     $('train-ident').hidden   = phase !== 'ident' && phase !== 'ident-feedback';
-    $('train-compare').hidden = phase !== 'compare';
     $('train-disc').hidden    = phase !== 'disc' && phase !== 'disc-feedback';
     $('train-done').hidden    = phase !== 'done';
   }
@@ -431,6 +430,10 @@
     const fb = $('ident-feedback');
     fb.hidden = true; fb.className = 'feedback-banner';
     $('ident-accuracy').hidden = true;
+    $('ident-compare').hidden = true;
+    $('ident-next').hidden = true;
+    $('compare-grid').innerHTML = '';
+    $('train-ident').querySelector('.audio-area').hidden = false;
 
     const shuffled = shuffle(item.words);
     for (const w of shuffled) {
@@ -507,6 +510,10 @@
       ts: Date.now(),
     });
 
+    // Hide audio area to save space
+    stopAudio();
+    $('train-ident').querySelector('.audio-area').hidden = true;
+
     // Feedback
     const fb = $('ident-feedback');
     fb.hidden = false;
@@ -521,9 +528,12 @@
     // Check mastery
     checkIdentMastery();
 
-    // Build comparison
+    // Show comparison inline below feedback
     buildCompare(identTrial.item, identTrial.speaker);
-    setTrainPhase('compare');
+    $('ident-compare').hidden = false;
+    $('ident-next').hidden = false;
+
+    fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   function buildCompare(item, speaker) {
@@ -562,7 +572,8 @@
       grid.appendChild(btn);
     }
 
-    $('compare-next').onclick = () => {
+    $('ident-next').onclick = () => {
+      stopAudio();
       if (identPendingMastery) {
         identPendingMastery = false;
         $('ident-mastery-modal').hidden = false;

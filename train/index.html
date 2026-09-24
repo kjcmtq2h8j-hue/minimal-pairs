@@ -77,14 +77,11 @@
         <div id="ident-choices" class="choices"></div>
         <div id="ident-feedback" class="feedback-banner" hidden></div>
         <div id="ident-accuracy" class="item-accuracy" hidden></div>
-      </div>
-
-      <!-- Identification comparison phase -->
-      <div id="train-compare" class="train-card" hidden>
-        <div class="phase-label">Compare — tap any word to hear it</div>
-        <div class="discrim-label">You can listen to each word as many times as you like.</div>
-        <div id="compare-grid" class="discrim-grid"></div>
-        <button id="compare-next" class="btn btn-primary btn-lg w-full">Next →</button>
+        <div id="ident-compare" hidden>
+          <div class="discrim-label" style="margin-top:1rem;">Compare — tap to hear each word</div>
+          <div id="compare-grid" class="discrim-grid"></div>
+        </div>
+        <button id="ident-next" class="btn btn-primary btn-lg w-full" hidden>Next →</button>
       </div>
 
       <!-- Discrimination trial -->
