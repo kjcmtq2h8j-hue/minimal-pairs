@@ -447,27 +447,32 @@
     playIdentAudio(rec.url);
   }
 
+  function enableIdentChoices() {
+    $('ident-choices').querySelectorAll('.choice-btn').forEach(b => b.disabled = false);
+  }
+
   function playIdentAudio(url) {
     stopAudio();
     $('ident-audio-status').textContent = 'Playing…';
     $('ident-replay').disabled = true;
     const audio = new Audio(url);
     currentAudio = audio;
-    audio.addEventListener('ended', () => {
+    audio.onended = () => {
       identAudioEnded = true;
       identStartTime = Date.now();
       $('ident-audio-status').textContent = '';
       $('ident-replay').disabled = false;
-      $('ident-choices').querySelectorAll('.choice-btn').forEach(b => b.disabled = false);
-    });
-    audio.addEventListener('error', () => {
-      $('ident-audio-status').textContent = 'Audio failed.';
+      enableIdentChoices();
+    };
+    audio.onerror = () => {
+      $('ident-audio-status').textContent = 'Audio failed. Select your best guess.';
       $('ident-replay').disabled = false;
-      $('ident-choices').querySelectorAll('.choice-btn').forEach(b => b.disabled = false);
-    });
+      enableIdentChoices();
+    };
     audio.play().catch(() => {
       $('ident-audio-status').textContent = 'Tap Replay to hear.';
       $('ident-replay').disabled = false;
+      enableIdentChoices();
     });
   }
 
@@ -541,7 +546,7 @@
       if (!rec) { btn.disabled = true; icon.textContent = '—'; }
       else {
         btn.addEventListener('click', () => {
-          if (cAudio) { cAudio.pause(); cAudio.src = ''; }
+          if (cAudio) { cAudio.onended = null; cAudio.pause(); }
           grid.querySelectorAll('.discrim-btn').forEach(b => {
             b.classList.remove('playing');
             b.querySelector('.play-icon').textContent = '▶';
@@ -550,8 +555,8 @@
           cAudio = a;
           btn.classList.add('playing');
           icon.textContent = '■';
-          a.addEventListener('ended', () => { btn.classList.remove('playing'); icon.textContent = '▶'; cAudio = null; });
-          a.play().catch(() => {});
+          a.onended = () => { btn.classList.remove('playing'); icon.textContent = '▶'; cAudio = null; };
+          a.play().catch(() => { btn.classList.remove('playing'); icon.textContent = '▶'; });
         });
       }
       grid.appendChild(btn);
@@ -663,7 +668,7 @@
     currentAudio = audio;
     btn.classList.add('playing');
     icon.textContent = '■';
-    audio.addEventListener('ended', () => { btn.classList.remove('playing'); icon.textContent = '▶'; currentAudio = null; });
+    audio.onended = () => { btn.classList.remove('playing'); icon.textContent = '▶'; currentAudio = null; };
     audio.play().catch(() => { btn.classList.remove('playing'); icon.textContent = '▶'; });
 
     if (!discStartTime) discStartTime = Date.now();
@@ -742,7 +747,12 @@
 
   // ── Helpers ───────────────────────────────────────────────────────────────
   function stopAudio() {
-    if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; currentAudio = null; }
+    if (currentAudio) {
+      currentAudio.onended = null;
+      currentAudio.onerror = null;
+      currentAudio.pause();
+      currentAudio = null;
+    }
   }
 
   function showAccBadge(el, acc) {
