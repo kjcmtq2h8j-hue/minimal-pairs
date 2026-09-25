@@ -83,9 +83,8 @@
   }
 
   function findEligibleSpeakers(item) {
-    const wordIds = item.words.map(w => w.id);
     const speakerSets = item.words.map(w =>
-      new Set(w.recordings.map(r => r.speaker).filter(Boolean))
+      new Set(w.recordings.filter(isPlayableRec).map(r => r.speaker).filter(Boolean))
     );
     if (speakerSets.length === 0) return [];
     let common = [...speakerSets[0]];
@@ -104,6 +103,16 @@
     }
     return ids[ids.length - 1];
   }
+
+  const _formatSupport = {};
+  function canPlayFormat(ext) {
+    if (ext in _formatSupport) return _formatSupport[ext];
+    const a = document.createElement('audio');
+    const types = { mp4: 'audio/mp4', webm: 'audio/webm', ogg: 'audio/ogg', wav: 'audio/wav' };
+    _formatSupport[ext] = a.canPlayType(types[ext] || '') !== '';
+    return _formatSupport[ext];
+  }
+  function isPlayableRec(r) { return canPlayFormat(r.url.split('.').pop()); }
 
   function randomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
@@ -372,6 +381,7 @@
   // ── Load next trial ───────────────────────────────────────────────────────
   function loadNextTrial() {
     setTrainPhase('loading');
+    try {
     const state = getState(currentPack.id);
     const limit = state.mastered ? REVIEW_LIMIT : ACTIVE_LIMIT;
 
@@ -404,6 +414,10 @@
     } else {
       loadDiscTrial(item, speaker);
     }
+    } catch (e) {
+      console.error('loadNextTrial error:', e);
+      $('train-loading').innerHTML = '<p class="loading-msg" style="color:var(--red);">Something went wrong. <a href="." style="color:var(--blue);">Restart</a></p>';
+    }
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -416,7 +430,7 @@
 
   function loadIdentTrial(item, speaker) {
     const stimWord = randomChoice(item.words);
-    const recs = stimWord.recordings.filter(r => r.speaker === speaker);
+    const recs = stimWord.recordings.filter(r => r.speaker === speaker && isPlayableRec(r));
     if (recs.length === 0) { showDone(); return; }
     const rec = randomChoice(recs);
 
@@ -450,16 +464,25 @@
     playIdentAudio(rec.url);
   }
 
+  let identFallbackTimer = null;
+
   function enableIdentChoices() {
+    if (identFallbackTimer) { clearTimeout(identFallbackTimer); identFallbackTimer = null; }
     $('ident-choices').querySelectorAll('.choice-btn').forEach(b => b.disabled = false);
   }
 
   function playIdentAudio(url) {
     stopAudio();
+    if (identFallbackTimer) { clearTimeout(identFallbackTimer); identFallbackTimer = null; }
     $('ident-audio-status').textContent = 'Playing…';
     $('ident-replay').disabled = true;
     const audio = new Audio(url);
     currentAudio = audio;
+    identFallbackTimer = setTimeout(() => {
+      $('ident-audio-status').textContent = 'Tap Replay to hear.';
+      $('ident-replay').disabled = false;
+      enableIdentChoices();
+    }, 8000);
     audio.onended = () => {
       identAudioEnded = true;
       identStartTime = Date.now();
@@ -472,11 +495,14 @@
       $('ident-replay').disabled = false;
       enableIdentChoices();
     };
-    audio.play().catch(() => {
-      $('ident-audio-status').textContent = 'Tap Replay to hear.';
-      $('ident-replay').disabled = false;
-      enableIdentChoices();
-    });
+    const p = audio.play();
+    if (p && p.catch) {
+      p.catch(() => {
+        $('ident-audio-status').textContent = 'Tap Replay to hear.';
+        $('ident-replay').disabled = false;
+        enableIdentChoices();
+      });
+    }
   }
 
   $('ident-replay')?.addEventListener('click', () => {
@@ -552,7 +578,8 @@
       btn.appendChild(icon);
       btn.appendChild(label);
 
-      const rec = w.recordings.find(r => r.speaker === speaker) || w.recordings[0];
+      const rec = w.recordings.find(r => r.speaker === speaker && isPlayableRec(r))
+        || w.recordings.find(isPlayableRec) || w.recordings[0];
       if (!rec) { btn.disabled = true; icon.textContent = '—'; }
       else {
         btn.addEventListener('click', () => {
@@ -566,7 +593,8 @@
           btn.classList.add('playing');
           icon.textContent = '■';
           a.onended = () => { btn.classList.remove('playing'); icon.textContent = '▶'; cAudio = null; };
-          a.play().catch(() => { btn.classList.remove('playing'); icon.textContent = '▶'; });
+          const cp = a.play();
+          if (cp && cp.catch) cp.catch(() => { btn.classList.remove('playing'); icon.textContent = '▶'; });
         });
       }
       grid.appendChild(btn);
@@ -622,7 +650,8 @@
   function loadDiscTrial(item, speaker) {
     const target = randomChoice(item.words);
     const options = shuffle(item.words.map(w => {
-      const rec = w.recordings.find(r => r.speaker === speaker) || w.recordings[0];
+      const rec = w.recordings.find(r => r.speaker === speaker && isPlayableRec(r))
+        || w.recordings.find(isPlayableRec) || w.recordings[0];
       return { word: w, rec };
     }));
 
@@ -680,7 +709,8 @@
     btn.classList.add('playing');
     icon.textContent = '■';
     audio.onended = () => { btn.classList.remove('playing'); icon.textContent = '▶'; currentAudio = null; };
-    audio.play().catch(() => { btn.classList.remove('playing'); icon.textContent = '▶'; });
+    const p = audio.play();
+    if (p && p.catch) p.catch(() => { btn.classList.remove('playing'); icon.textContent = '▶'; });
 
     if (!discStartTime) discStartTime = Date.now();
   }
